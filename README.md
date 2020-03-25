@@ -9,21 +9,41 @@
 
 The goal of SticsPubRTools is to …
 
+## Prerequisites and technical tips
+
 ## Installation
 
-You can install the released version of SticsPubRTools from
-[CRAN](https://CRAN.R-project.org) with:
+The package installation can be done directly from
+[GitHub](https://github.com/) using either `devtools` or the lightweight
+one [remotes](https://github.com/r-lib/remotes#readme) package
+
+The last release version can be installed using:
+
+  - With `devtools`
+
+<!-- end list -->
 
 ``` r
-install.packages("SticsPubRTools")
+devtools::install_github("SticsRPacks/SticsPubRTools@*release")
 ```
 
-And the development version from [GitHub](https://github.com/) with:
+  - With `remotes`
+
+<!-- end list -->
 
 ``` r
-# install.packages("devtools")
+# install.packages("remotes")
+remotes::install_github("SticsRPacks/SticsPubRTools@*release")
+```
+
+Or the current development version can be installed using:
+
+``` r
 devtools::install_github("SticsRPacks/SticsPubRTools")
 ```
+
+Normaly, all the package dependencies will be installed for CRAN
+packages.
 
 ## Example
 

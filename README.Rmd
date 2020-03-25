@@ -20,20 +20,36 @@ knitr::opts_chunk$set(
 
 The goal of SticsPubRTools is to ...
 
+## Prerequisites and technical tips
+
+
 ## Installation
 
-You can install the released version of SticsPubRTools from [CRAN](https://CRAN.R-project.org) with:
+
+The package installation can be done directly from [GitHub](https://github.com/) using either `devtools` or the lightweight one [remotes](https://github.com/r-lib/remotes#readme) package
+
+The last release version can be installed using:
+
+* With `devtools`
 
 ``` r
-install.packages("SticsPubRTools")
+devtools::install_github("SticsRPacks/SticsPubRTools@*release")
+```
+* With `remotes`
+
+``` r
+# install.packages("remotes")
+remotes::install_github("SticsRPacks/SticsPubRTools@*release")
 ```
 
-And the development version from [GitHub](https://github.com/) with:
-
+Or the current development version can be installed using:
 ``` r
-# install.packages("devtools")
 devtools::install_github("SticsRPacks/SticsPubRTools")
 ```
+
+
+Normaly, all the package dependencies will be installed for CRAN packages.
+
 ## Example
 
 This is a basic example which shows you how to solve a common problem:

@@ -4,15 +4,19 @@
 \alias{generate_book}
 \title{Generating a bookdown document or a part of}
 \usage{
-generate_book(chap_rmd = NULL, book_pkg_dir = getwd(), output_format = NULL)
+generate_book(
+  input_rmd = "index.Rmd",
+  book_pkg_dir = getwd(),
+  output_format = NULL
+)
 }
 \arguments{
-\item{chap_rmd}{Chapter Rmd file name (optional)}
+\item{input_rmd}{Chapter Rmd file name (optional)}
 
 \item{book_pkg_dir}{}
 }
 \value{
-A status of the generated document
+A success status of the document generation
 }
 \description{
 The generation of an entire book is performed without
