@@ -8,7 +8,7 @@
 #' @description The generation of an entire book is performed without
 #' any given arguments using the current directory which must be an
 #' package book directory or giving a path to the package. A part of the
-#' book may be generated when a Rmd file name is given.
+#' book may be generated when a Rmd file name or a list of is given.
 #'
 #' @return A success status of the document generation
 #' @export
@@ -22,6 +22,9 @@
 #' generate_book(input_rmd = "07-chap.Rmd", output_format = 'bookdown::pdf_document2')
 #'
 #' }
+#'
+#'
+#'
 generate_book <- function(input_rmd = 'index.Rmd',
                           book_pkg_dir = getwd(),
                           output_format = NULL ) {

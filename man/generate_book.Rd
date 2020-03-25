@@ -13,7 +13,10 @@ generate_book(
 \arguments{
 \item{input_rmd}{Chapter Rmd file name (optional)}
 
-\item{book_pkg_dir}{}
+\item{book_pkg_dir}{Book package directory path (optional, default: current directory)}
+
+\item{output_format}{String defining the type of document to build
+(optional, default: "bookdown::html_document2")}
 }
 \value{
 A success status of the document generation
@@ -22,5 +25,18 @@ A success status of the document generation
 The generation of an entire book is performed without
 any given arguments using the current directory which must be an
 package book directory or giving a path to the package. A part of the
-book may be generated when a Rmd file name is given.
+book may be generated when a Rmd file name or a list of is given.
+}
+\examples{
+\dontrun{
+generate_book()
+
+generate_book(input_rmd = "07-chap.Rmd")
+
+generate_book(input_rmd = "07-chap.Rmd", output_format = 'bookdown::pdf_document2')
+
+}
+
+
+
 }

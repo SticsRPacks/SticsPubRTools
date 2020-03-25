@@ -1,16 +1,22 @@
 Package: SticsPubRTools
-Title: What the Package Does (One Line, Title Case)
+Title: Help functionalities for formatting Rmarkdown documents 
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Patrice",
+           family = "Leharpentier",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: What license it uses
+           email = "patrice.lecharpentier@inrae.fr")
+Description: Provides functions for simplifying Rmarkdown formatting, document generation, illustrations generation including a graphical charter/theme ...
+URL: https://github.com/SticsRPacks/SticsRFiles
+BugReports: https://github.com/SticsRPacks/SticsRFiles/issues
+License: file LICENSE
 Encoding: UTF-8
 LazyData: true
+VignetteBuilder: knitr
 Suggests: 
-    testthat
+    testthat,
+    knitr
 RoxygenNote: 7.0.2
+Imports: 
+    bookdown,
+    methods
