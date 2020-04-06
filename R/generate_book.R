@@ -25,7 +25,7 @@
 #'
 #'
 #'
-generate_book <- function(input_rmd = 'index.Rmd',
+generate_book <- function(input_rmd = NULL,
                           book_pkg_dir = getwd(),
                           output_format = NULL ) {
 
@@ -39,22 +39,25 @@ generate_book <- function(input_rmd = 'index.Rmd',
 
   # For specific parts Rmd files building
   if (! base::is.null(input_rmd)) {
-    book_name <- paste("Chapter", input_rmd)
+    book_name <- paste("Chapter(s)", input_rmd)
     full_book<- FALSE
+  } else {
+    input_rmd <- "index.Rmd"
   }
 
   # Output message
   msg <- paste("generating ...", paste(book_name, collapse = ","))
 
+  setwd(book_pkg_dir)
   # Rmd files path
-  input <- file.path(book_pkg_dir, input_rmd)
+  #input <- file.path(book_pkg_dir, input_rmd)
 
   # Build execution relative to input content
   ret <- try(
     if (full_book) {
-      bookdown::render_book(input = input, output_format = doc_format)
+      bookdown::render_book(input = input_rmd, output_format = doc_format)
     } else {
-      bookdown::preview_chapter(input = input, output_format = doc_format)
+      bookdown::preview_chapter(input = input_rmd, output_format = doc_format)
     })
 
   # Generation success status

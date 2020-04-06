@@ -4,11 +4,7 @@
 \alias{generate_book}
 \title{Generating a bookdown document or a part of}
 \usage{
-generate_book(
-  input_rmd = "index.Rmd",
-  book_pkg_dir = getwd(),
-  output_format = NULL
-)
+generate_book(input_rmd = NULL, book_pkg_dir = getwd(), output_format = NULL)
 }
 \arguments{
 \item{input_rmd}{Chapter Rmd file name (optional)}
