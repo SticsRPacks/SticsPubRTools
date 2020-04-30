@@ -1,0 +1,15 @@
+---
+title: "Technical_workflow_documentation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Resources for creating open-access digital book
+
+Publishing workflow:
+
+https://ontheline.trincoll.edu/mapping-publishing.html
+
