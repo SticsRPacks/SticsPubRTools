@@ -31,7 +31,7 @@ generate_book <- function(input_rmd = NULL,
 
   book_name <- "book"
   full_book <- TRUE
-  doc_format <- 'bookdown::html_document2'
+  doc_format <- 'bookdown::gitbook'
 
 
   # Overloading default format
@@ -48,27 +48,35 @@ generate_book <- function(input_rmd = NULL,
   # Checking if files exist
   if (!all(file.exists(input_rmd))) stop("Check if all files exist!")
 
-  # Output message
-  msg <- paste("generating ...", paste(book_name, collapse = ","))
 
   setwd(book_pkg_dir)
   # Rmd files path
-  #input <- file.path(book_pkg_dir, input_rmd)
+
+  # TODO: change output_dir depending on output_format
+  # html : one file in the book project root
+  # gitbook : get_output_dir()
 
   # Build execution relative to input content
   ret <- try(
     if (full_book) {
       bookdown::render_book(input = input_rmd, output_format = doc_format)
+      #output_dir <- get_output_dir()
     } else {
       bookdown::preview_chapter(input = input_rmd, output_format = doc_format)
+      #output_dir <- book_pkg_dir
     })
 
-  # Generation success status
-  status <- !methods::is(ret, "try-error")
+  return(invisible(output_dir))
+}
 
-  if (! status) msg <- paste("Error", msg)
 
-  print(msg)
+get_output_dir <- function(dir = getwd()) {
+  f <- file.path(dir, "_bookdown.yml")
+  if (!file.exists(f)) return()
 
-  return(status)
+  l <- readLines(f)
+  idx <- grep(pattern = "output_dir: (.*)", x = l)
+  if (!length(idx) | length(idx) > 1) return("_book")
+
+  gsub(pattern = "output_dir: (.*)", x = l[idx], replacement = "\\1")
 }
