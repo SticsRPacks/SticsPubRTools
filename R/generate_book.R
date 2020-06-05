@@ -45,6 +45,9 @@ generate_book <- function(input_rmd = NULL,
     input_rmd <- "index.Rmd"
   }
 
+  # Checking if files exist
+  if (!all(file.exists(input_rmd))) stop("Check if all files exist!")
+
   # Output message
   msg <- paste("generating ...", paste(book_name, collapse = ","))
 
