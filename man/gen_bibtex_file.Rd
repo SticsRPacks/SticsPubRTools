@@ -6,6 +6,7 @@
 \usage{
 gen_bibtex_file(
   file_path = NULL,
+  library = "livre_rouge",
   query = "",
   query_type = "full",
   verbose = FALSE,

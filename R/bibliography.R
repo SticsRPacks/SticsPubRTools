@@ -1,6 +1,7 @@
 #' Generating a BibTex file using a query to a Zotero web base
 #'
 #' @param file_path A BibTex file path (with a .bib extension)
+#' @param library A group library name (appearing in groups in Zotero web)
 #' @param query A character string to use for querying bibliographic base
 #' @param query_type A query type: "full" (the default) for searching in all the fields,
 #' or "basic" for searching only in title, creator, year fields
@@ -30,6 +31,7 @@
 #'
 #'
 gen_bibtex_file <- function( file_path = NULL ,
+                             library = "livre_rouge",
                              query = "",
                              query_type ="full",
                              verbose = FALSE,
@@ -51,7 +53,7 @@ gen_bibtex_file <- function( file_path = NULL ,
 
 
   # Getting BibEntry of all references from the zotero base
-  BibEntry_obj <- get_references(query = query, query_type = query_type)
+  BibEntry_obj <- get_references(library = library, query = query, query_type = query_type)
 
   # Checking content, aborting if NULL
   if(base::is.null(BibEntry_obj)) stop("Not any references returned by the query !")
@@ -67,13 +69,17 @@ gen_bibtex_file <- function( file_path = NULL ,
 }
 
 
-get_references <- function(query = "", query_type = "basic", verbose = FALSE) {
+#TODO: see if specific functions may be added
+# i.e. : gen_livre_rouge_bibtex_file, gen_stics_bibtex_file !
+
+
+get_references <- function(library, query = "", query_type = "basic", verbose = FALSE) {
 
   # Fixing options for just warning
   RefManageR::BibOptions(check.entries = "warn")
 
   # First query (will contain the merged queries resutls in the end)
-  BibEntry_obj_full <- read_zotero_references( query = query, query_type = query_type)
+  BibEntry_obj_full <- read_zotero_references( library = library, query = query, query_type = query_type)
 
   # if no references found
   if(base::is.null(BibEntry_obj_full)) return()
@@ -85,7 +91,7 @@ get_references <- function(query = "", query_type = "basic", verbose = FALSE) {
 
     if(verbose) print(start)
 
-    BibEntry_obj <- read_zotero_references( query = query, query_type = query_type, start = start)
+    BibEntry_obj <- read_zotero_references( library = library, query = query, query_type = query_type, start = start)
 
     # Reference number got from the query
     n_ref <-  length(BibEntry_obj)
@@ -110,9 +116,12 @@ get_references <- function(query = "", query_type = "basic", verbose = FALSE) {
 
 # @param start A numeric indicating from which record number in the base to start the query
 
-read_zotero_references <- function(query = "", query_type = "basic", start = 1) {
+read_zotero_references <- function(library, query = "", query_type = "basic", start = 1) {
 
-  group_id <- "2450934" # livre_rouge
+  #group_id <- "2450934" # livre_rouge
+  group_id <- get_group_id(group_name = library)
+
+  if (base::is.null(group_id)) stop("Unknown library name",library)
 
   params <- get_query_params( query = query, query_type = query_type, start = start)
 
@@ -147,6 +156,25 @@ get_query_params <- function( key = NULL,
   return(params)
 }
 
+
+get_group_id <- function(group_name = NULL) {
+
+  groups <- get_groups()
+
+  if (!group_name %in% names(groups)) return()
+
+  return(groups[[group_name]])
+
+}
+
+
+get_groups <- function() {
+  groups <- list()
+  groups$livre_rouge <- "2450934"
+  groups$equipe_projet_stics <- "857933"
+
+  return(groups)
+}
 
 get_access_key <- function(access = "read") {
 
