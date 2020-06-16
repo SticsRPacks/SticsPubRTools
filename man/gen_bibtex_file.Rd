@@ -16,6 +16,8 @@ gen_bibtex_file(
 \arguments{
 \item{file_path}{A BibTex file path (with a .bib extension)}
 
+\item{library}{A group library name (appearing in groups in Zotero web)}
+
 \item{query}{A character string to use for querying bibliographic base}
 
 \item{query_type}{A query type: "full" (the default) for searching in all the fields,
