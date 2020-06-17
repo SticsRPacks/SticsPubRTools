@@ -1,15 +1,73 @@
 ---
-title: "Technical_workflow_documentation"
-output: html_document
+title: "Technical book workflow documentation"
+output: 
+   pdf_document:
+     keep_tex: yes
+     number_sections: true
+   html_document:
+     toc: yes
+     toc_float: true
+     number_sections: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Resources for creating open-access digital book
+# Resources for creating open-access digital book
 
-Publishing workflow:
-
+* Publishing workflow:
 https://ontheline.trincoll.edu/mapping-publishing.html
+
+
+* Publish with a publisher & graphic chart defining !
+https://bookdown.org/yihui/bookdown/publishers.html
+
+* Custom build workflow for different output formats
+    * html/gitbook
+    * pdf
+    * html with a specific graphical chart (publisher) to be converted into a standard Epub
+    
+    
+* See Rmarkdown and possibilities for each output format
+
+
+* Latex capabilities and constraints!
+
+
+
+# Defining parameterization of the book
+## Bookdown parameterization
+https://www.eddjberry.com/post/writing-your-thesis-with-bookdown/
+
+## Yaml parameterization and tools
+
+### **ymlthis**
+* package to help to format yml header for differents outputs
+https://ymlthis.r-lib.org/index.html
+
+
+## How to define the graphical chart using CSS files 
+
+
+## Graphs and themes
+
+* using themes
+
+
+* defining themes
+
+
+* ggplot and themes
+
+
+# Defining functions for the book illustrations
+* Using customizations processes in functions
+* 
+
+...
+
+
+
+
 
