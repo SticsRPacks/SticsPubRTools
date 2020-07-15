@@ -5,7 +5,7 @@ get_label_from_name <- function(name = NULL, sep = "-", no_number_first = TRUE) 
   # Checking first character
   if (no_number_first) {
     is_char <- suppressWarnings(base::is.na(as.numeric(substr(name,1,1))))
-    if (!is_char) stop("Only letters as string starting character !")
+    if (!all(is_char)) stop("Only letters as string starting character !")
   }
 
   # name treatment
