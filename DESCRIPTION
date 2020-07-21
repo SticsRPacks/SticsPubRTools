@@ -20,4 +20,9 @@ RoxygenNote: 7.1.0
 Imports: 
     bookdown,
     methods,
-    RefManageR
+    RefManageR,
+    SticsRFiles,
+    dplyr (>= 0.8.5),
+    shiny,
+    miniUI,
+    ggplot2
