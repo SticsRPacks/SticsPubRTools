@@ -10,6 +10,10 @@ insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE) {
   # Formating name before insertion
   if (format) {
     fname <- format_name(name = name, type = type, kind = kind)
+    # print("formatting name")
+    # print(type)
+    # print(kind)
+    # print(fname)
   }
 
   # check fname content
@@ -87,7 +91,8 @@ format_name <- function(name, type = "par", kind = NULL) {
 
   ind <- dico_kind_to_index(kind = kind)
 
-  name <- gsub(pattern = "\\_", replacement = "\\\\_", name)
+  #name <- gsub(pattern = "\\_", replacement = "\\\\_", name)
+  name <- make_pattern(name)
 
   name_str <- paste0(" $\\mathbf{", name,"}","_{",ind,"}$ ")
 
@@ -123,6 +128,15 @@ dico_kind_to_index <- function( kind = NULL) {
 
   return(kinds[[kind]])
 
+}
+
+make_pattern <- function(name, symbol = c("(",")","_", ".")) {
+
+  for (i in 1:length(symbol)) {
+    s <- symbol[i]
+    name <- gsub(pattern = paste0("\\",s), x = name, replacement = paste0("\\\\",s))
+  }
+  return(name)
 }
 
 
