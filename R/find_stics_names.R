@@ -1,3 +1,10 @@
+#' Gadget for finding Stics names (parameters, variables)
+#'
+#'
+#' @export
+#'
+#' @examples
+#'
 find_stics_names <- function() {
   # Masquing warnings display during app execution
   options(warn=-1)
