@@ -1,0 +1,4 @@
+Name: Insert Stics names
+Description: Searching names based on partial match, insert formatted name for RMarkdown.
+Binding: find_stics_names
+Interactive: true
