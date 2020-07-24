@@ -1,7 +1,7 @@
-#' Insert Stics names.
-#'
-#' Call this function as an addin to insert \code{ Stics names } at the cursor position.
-#'
+# Insert Stics names.
+#
+# Call this function as an addin to insert \code{ Stics names } at the cursor position.
+#
 # @export
 insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE) {
 
@@ -22,10 +22,10 @@ insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE) {
 
 
 
-#' Get Stics names list
-#'
-#' Call this function for getting parameters or variables names from SticsRFiles pkg
-#'
+# Get Stics names list
+#
+# Call this function for getting parameters or variables names from SticsRFiles pkg
+#
 # @export
 get_names_list <- function(type = "par", stics_version = "last") {
 

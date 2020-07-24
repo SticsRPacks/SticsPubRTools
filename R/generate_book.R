@@ -66,7 +66,7 @@ generate_book <- function(input_rmd = NULL,
       #output_dir <- book_pkg_dir
     })
 
-  return(invisible(output_dir))
+  return(invisible(book_pkg_dir))
 }
 
 
