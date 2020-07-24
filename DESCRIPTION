@@ -25,4 +25,5 @@ Imports:
     dplyr (>= 0.8.5),
     shiny,
     miniUI,
-    ggplot2
+    ggplot2,
+    tibble

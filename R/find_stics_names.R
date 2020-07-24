@@ -3,12 +3,16 @@
 #'
 #' @export
 #'
-#' @examples
-#'
+# @examples
+
 find_stics_names <- function() {
+  require(SticsRFiles)
+
   # Masquing warnings display during app execution
   options(warn=-1)
   on.exit(options(warn=0))
+
+  tags <- shiny::tags
 
   css <-
   "
@@ -28,7 +32,8 @@ find_stics_names <- function() {
 
   ui <- miniUI::miniPage(title = "Stics names",
                          tags$style(css),
-                         miniUI::gadgetTitleBar("Search a Stics parameter or variable"),
+                         miniUI::miniTitleBar(title = "Search a Stics parameter or variable"
+                         ),
                          miniUI::miniContentPanel(
 
                            shiny::fillRow(height = "40%",
@@ -56,6 +61,7 @@ find_stics_names <- function() {
                          ),
 
                          miniUI::miniButtonBlock(
+                           shiny::actionButton("cancel", "Cancel"),
                            shiny::actionButton("insert", "Insert name"),
                            border = "top"
                          ),
@@ -160,6 +166,11 @@ find_stics_names <- function() {
     # Handle the done button click for quitting the app
     shiny::observeEvent(input$done, {
       shiny::stopApp("Bye")
+    })
+
+    # Handle the cancel button click for quitting the app
+    shiny::observeEvent(input$cancel, {
+      shiny::stopApp()
     })
 
   }

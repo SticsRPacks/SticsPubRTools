@@ -33,16 +33,16 @@ get_names_list <- function(type = "par", stics_version = "last") {
 
   if (! type %in% type_list) stop()
 
-  stics_version <- SticsRFiles:::check_version_compat(version_name = stics_version)
+  stics_version <- SticsRFiles:::checkversion(version_name = stics_version)
 
   names_var <- paste0(type, "_names")
 
   # Creating stics_names env in stics env
-  if (! SticsRFiles:::stics_exists(name = "stics_names")) SticsRFiles:::stics_env(name = "stics_names")
+  if (! SticsRFiles::sticsexists(name = "stics_names")) SticsRFiles::sticsenv(name = "stics_names")
 
   # If the variable param_names or var_names in the stics_names
   # environment, returning the value got from the environment.
-  names <- SticsRFiles:::stics_get(name = paste0(names_var,"$", stics_version), env_name = "stics_names")
+  names <- SticsRFiles::sticsget(name = paste0(names_var,"$", stics_version), env_name = "stics_names")
 
   if ( ! base::is.null(names)) return(names)
 
@@ -61,13 +61,13 @@ get_names_list <- function(type = "par", stics_version = "last") {
 
 
   # Create a variable: param_names or var_names in the stics_names environment
-  if (! SticsRFiles:::stics_exists(name = names_var, env_name = "stics_names")) {
-    SticsRFiles:::stics_set(name = names_var,
+  if (! SticsRFiles::sticsexists(name = names_var, env_name = "stics_names")) {
+    SticsRFiles::sticsset(name = names_var,
                             value = list(),
                             env_name = "stics_names")
   }
 
-  SticsRFiles:::stics_set(name = paste0(names_var,"$", stics_version),
+  SticsRFiles::sticsset(name = paste0(names_var,"$", stics_version),
                           value = names,
                           env_name = "stics_names")
 
