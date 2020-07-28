@@ -3,23 +3,27 @@
 # Call this function as an addin to insert \code{ Stics names } at the cursor position.
 #
 # @export
-insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE) {
+insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE, link = FALSE) {
 
-  fname <- name
-
+  if (!format && !link) {
+    rstudioapi::insertText(name)
+    return(invisible())
+  }
   # Formating name before insertion
-  if (format) {
+  if (!link) {
     fname <- format_name(name = name, type = type, kind = kind)
     # print("formatting name")
     # print(type)
     # print(kind)
     # print(fname)
+    rstudioapi::insertText(fname)
+    return(invisible())
   }
 
+  fname <- format_names_link(names = name, kinds = kind , type = type)
   # check fname content
   rstudioapi::insertText(fname)
 }
-
 
 
 # Get Stics names list
@@ -63,13 +67,13 @@ get_names_list <- function(type = "par", stics_version = "last") {
   # Create a variable: param_names or var_names in the stics_names environment
   if (! SticsRFiles::sticsexists(name = names_var, env_name = "stics_names")) {
     SticsRFiles::sticsset(name = names_var,
-                            value = list(),
-                            env_name = "stics_names")
+                          value = list(),
+                          env_name = "stics_names")
   }
 
   SticsRFiles::sticsset(name = paste0(names_var,"$", stics_version),
-                          value = names,
-                          env_name = "stics_names")
+                        value = names,
+                        env_name = "stics_names")
 
   # the first column: name for par, variable for var
   if (!base::is.null(names) & length(names)) return(names)
@@ -85,9 +89,10 @@ format_name <- function(name, type = "par", kind = NULL) {
 
   if (!type %in% types ) return()
 
-  if ( type == "var" && base::is.null(kind)) return(paste0(" $", name,"$ "))
+  if ( type == "var" && base::is.null(kind)) return(paste0(" $", make_pattern(name),"$ "))
 
-  if (base::is.null(kind)) return("")
+  # Identity
+  if (base::is.null(kind)) return()
 
   ind <- dico_kind_to_index(kind = kind)
 
@@ -99,6 +104,40 @@ format_name <- function(name, type = "par", kind = NULL) {
   return(name_str)
 
 }
+
+format_names <- function(names, kinds=NULL, type = "par") {
+
+  # checking dimensions
+  names_nb <- length(names)
+
+  if (base::is.null(kinds)) {
+    return(unlist(lapply(names, function(x) format_name(x, type = type))))
+  }
+
+  if(names_nb != length(kinds)) {
+    stop("Error: parameter kind number must match parameter number !")
+  }
+
+  out_names <- vector(mode = "character", names_nb)
+  for (i in 1:names_nb) {
+    out_names[i] <- format_name(name = names[i], kind = kinds[i])
+  }
+
+  return(out_names)
+}
+
+
+format_names_link <- function(names, kinds= NULL , type = "par") {
+
+  formatted_names <- format_names(names = names, kinds = kinds, type = type)
+
+  names_label <- get_label_from_name(names)
+
+  names_link <- sprintf("[%s]{#%s}", formatted_names, names_label )
+
+  return(names_link)
+}
+
 
 
 dico_kind_to_index <- function( kind = NULL) {
@@ -130,13 +169,23 @@ dico_kind_to_index <- function( kind = NULL) {
 
 }
 
-make_pattern <- function(name, symbol = c("(",")","_", ".")) {
+make_pattern <- function(name, symbol = c("_", "."), where = NULL) {
+
+  pos <- c("start", "end")
+  if (! base::is.null(where) && (! where %in% pos)) where <- NULL
 
   for (i in 1:length(symbol)) {
     s <- symbol[i]
-    name <- gsub(pattern = paste0("\\",s), x = name, replacement = paste0("\\\\",s))
+    name <- gsub(pattern = paste0("\\",s), x = name, replacement = paste0('\\\\',s))
   }
-  return(name)
+
+  if (base::is.null(where)) return(name)
+
+  if (where == "start") return(paste0("^", name))
+
+  if (where == "end") return(paste0(name, "$"))
+
+  #return(name)
 }
 
 

@@ -12,15 +12,16 @@ find_stics_names <- function() {
   options(warn=-1)
   on.exit(options(warn=0))
 
-  tags <- shiny::tags
-
   css <-
-  "
+    "
   #name {
     color: blue;
   }
   #table {
     background: #f2f2f2;
+  }
+  #number {
+    color: blue;
   }
   #insert {
     background-color:#337ab7;
@@ -31,40 +32,49 @@ find_stics_names <- function() {
   last_version <- SticsRFiles::get_stics_versions_compat()$last_version
 
   ui <- miniUI::miniPage(title = "Stics names",
-                         tags$style(css),
+                         shiny::tags$style(css),
                          miniUI::miniTitleBar(title = "Search a Stics parameter or variable"
                          ),
                          miniUI::miniContentPanel(
 
-                           shiny::fillRow(height = "40%",
+                           shiny::fillRow(height = "35%",
                                           shiny::fillCol(width = "70%",
-                                            shiny::selectInput(inputId = "type", label = shiny::strong("Type of name"),
-                                                               choices = c("variable", "parameter"),selected = "parameter")
+                                                         shiny::selectInput(inputId = "type", label = shiny::strong("Type of name"),
+                                                                            choices = c("variable", "parameter"),selected = "parameter")
                                           ),
                                           shiny::fillCol(width = "70%",
-                                            shiny::selectInput(inputId = "version", label = shiny::strong("Stics version"),
-                                                               choices = stics_versions,
-                                                               selected = last_version))
+                                                         shiny::selectInput(inputId = "version", label = shiny::strong("Stics version"),
+                                                                            choices = stics_versions,
+                                                                            selected = last_version))
                            ),
 
-                           shiny::fillRow(height = "40%",
+                           shiny::fillRow(height = "35%",
                                           shiny::fillCol(
                                             shiny::textInput(inputId = "name", label = shiny::strong("Searched name") ,
                                                              width = "80%" , placeholder = "Enter a name or a part of")
-                                          ),
+                                          )
+                           ),
+
+                           shiny::fillRow(height = "20%",
                                           shiny::fillCol(
                                             shiny::checkboxInput(inputId = "format", label = "Format name for RMarkdown", value = TRUE)
+                                          ),
+                                          shiny::fillCol(
+                                            shiny::checkboxInput(inputId = "link", label = "Format link for RMarkdown", value = TRUE)
                                           )
-
                            ),
+
                            shiny::textOutput(outputId = "number")
                          ),
 
                          miniUI::miniButtonBlock(
                            shiny::actionButton("cancel", "Cancel"),
-                           shiny::actionButton("insert", "Insert name"),
-                           border = "top"
+                           shiny::actionButton("insert", "Insert name", shiny::icon("cog", lib = "glyphicon"))
                          ),
+                         # miniUI::miniContentPanel(
+                         #   # miniUI::gadgetTitleBar("Results"),
+                         #   shiny::tableOutput(outputId = "show")
+                         # ),
 
                          miniUI::miniContentPanel(
                            # miniUI::gadgetTitleBar("Results"),
@@ -85,19 +95,25 @@ find_stics_names <- function() {
       #print(input$version)
       if (length(in_name())) {
         l <- get_names_list(type = names_type(), stics_version = names_version())
-        id <- grepl(pattern = make_pattern(in_name()), x = l[[1]])
+        id <- grepl(pattern = make_pattern(in_name(), where = "start"), x = l[[1]])
         l[id, ]
       }
     })
 
-    # getting format activation
+    # getting name format activation
     names_format <- shiny::reactive({input$format})
+
+    # getting name link format activation
+    names_link <- shiny::reactive({input$link})
 
     # getting selected version
     names_version <- shiny::reactive({input$version})
 
     # getting the name typed
     in_name <- shiny::reactive({input$name})
+
+    # getting the name typed
+    rows_num <- shiny::reactive({dim(names_table())[1]})
 
     # getting the found number of par or var
     #names_number <- shiny::reactive({nrow(output$table)})
@@ -111,6 +127,10 @@ find_stics_names <- function() {
       caption.placement = getOption("xtable.caption.placement", "top"),
       caption.width = getOption("xtable.caption.width", NULL)
       )
+
+      output$number <- shiny::renderText(paste0(as.character(rows_num()),
+                                                " ", input$type,
+                                                '(s) found'))
     })
 
     # Handle the type selection in dropdown list on loaded table
@@ -121,6 +141,11 @@ find_stics_names <- function() {
       caption.placement = getOption("xtable.caption.placement", "top"),
       caption.width = getOption("xtable.caption.width", NULL)
       )
+
+      output$number <- shiny::renderText(paste0(as.character(rows_num()),
+                                                " ", input$type,
+                                                '(s) found'))
+
     })
 
     # Handle the version selection on table loaded for a given type
@@ -131,7 +156,11 @@ find_stics_names <- function() {
       caption.placement = getOption("xtable.caption.placement", "top"),
       caption.width = getOption("xtable.caption.width", NULL)
       )
-      #output$number <- renderText(nrow(output$table))
+
+      output$number <- shiny::renderText(paste0(as.character(rows_num()),
+                                                " ", input$type,
+                                                '(s) found'))
+
     })
 
     # Handle the Insert button being pressed.
@@ -149,6 +178,7 @@ find_stics_names <- function() {
         shiny::stopApp(insert_stics_name(name = loc_table$name[1],
                                          kind = loc_table$kind[1],
                                          format = names_format(),
+                                         link = names_link(),
                                          type = "par"
         ))
       }
@@ -157,16 +187,13 @@ find_stics_names <- function() {
         # print(names_table()$variable[1])
         shiny::stopApp(insert_stics_name(name = loc_table$variable[1],
                                          format = names_format(),
+                                         link = names_link(),
                                          type = "var"
         ))
       }
 
     })
 
-    # Handle the done button click for quitting the app
-    shiny::observeEvent(input$done, {
-      shiny::stopApp("Bye")
-    })
 
     # Handle the cancel button click for quitting the app
     shiny::observeEvent(input$cancel, {
@@ -175,7 +202,7 @@ find_stics_names <- function() {
 
   }
 
-  shiny::runGadget(ui, server, viewer = shiny::dialogViewer("find_stics_names"))
+  shiny::runGadget(ui, server, viewer = shiny::dialogViewer("Find and insert Stics names"))
 
 }
 
