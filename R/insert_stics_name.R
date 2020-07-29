@@ -46,7 +46,9 @@ get_names_list <- function(type = "par", stics_version = "last") {
 
   # If the variable param_names or var_names in the stics_names
   # environment, returning the value got from the environment.
-  names <- SticsRFiles::sticsget(name = paste0(names_var,"$", stics_version), env_name = "stics_names")
+  names <- suppressWarnings(
+    SticsRFiles::sticsget(name = paste0(names_var,"$", stics_version), env_name = "stics_names")
+    )
 
   if ( ! base::is.null(names)) return(names)
 

@@ -60,7 +60,7 @@ find_stics_names <- function() {
                                             shiny::checkboxInput(inputId = "format", label = "Format name for RMarkdown", value = TRUE)
                                           ),
                                           shiny::fillCol(
-                                            shiny::checkboxInput(inputId = "link", label = "Format link for RMarkdown", value = TRUE)
+                                            shiny::checkboxInput(inputId = "link", label = "Format link for RMarkdown", value = FALSE)
                                           )
                            ),
 
