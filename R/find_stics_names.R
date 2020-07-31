@@ -34,6 +34,9 @@ find_stics_names <- function() {
     background-color:#337ab7;
     color:#e8f0f7;
   }
+  #indication {
+    color:red;
+  }
   #cancel {
     background-color:#A9A9A9;
   }
@@ -76,8 +79,15 @@ find_stics_names <- function() {
                                             shiny::checkboxInput(inputId = "link", label = "Format for RMarkdown", value = TRUE)
                                           )
                            ),
+                           shiny::fillRow(height = "20%",
 
-                           shiny::textOutput(outputId = "number")
+                                          shiny::fillCol(
+                                            shiny::textOutput(outputId = "number")
+                                          ),
+                                          shiny::fillCol(
+                                            shiny::textOutput(outputId = "indication")
+                                          )
+                           )
                          ),
 
                          miniUI::miniButtonBlock(
@@ -168,7 +178,9 @@ find_stics_names <- function() {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      output$table <- DT::renderDataTable(datatable(names_table(),options = list(searching = FALSE)),
+      output$table <- DT::renderDataTable(datatable(names_table(),
+                                                    options = list(searching = FALSE),
+                                                    caption = "Click on lines to select or unselect"),
                                           server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
@@ -185,7 +197,9 @@ find_stics_names <- function() {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      output$table <- DT::renderDataTable(datatable(names_table(),options = list(searching = FALSE)),
+      output$table <- DT::renderDataTable(datatable(names_table(),
+                                                    options = list(searching = FALSE),
+                                                    caption = "Click on lines to select or unselect"),
                                           server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
@@ -204,7 +218,9 @@ find_stics_names <- function() {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      output$table <- DT::renderDataTable(datatable(names_table(),options = list(searching = FALSE)),
+      output$table <- DT::renderDataTable(datatable(names_table(),
+                                                    options = list(searching = FALSE),
+                                                    caption = "Click on lines to select or unselect"),
                                           server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
@@ -222,6 +238,10 @@ find_stics_names <- function() {
       #if (rows_num() > 1 || !rows_num()) return()
 
       lines_sel <- input$table_rows_selected
+
+      if(base::is.null(lines_sel)) {
+        output$indication <- shiny::renderText("Click on lines to select or unselect a row before inserting !")
+      }
 
       #print(lines_sel)
 
@@ -252,10 +272,10 @@ find_stics_names <- function() {
     })
 
 
-    # Handle the cancel button click for quitting the app
-    shiny::observeEvent(input$cancel, {
-      shiny::stopApp()
-    })
+      # Handle the cancel button click for quitting the app
+      shiny::observeEvent(input$cancel, {
+        shiny::stopApp()
+      })
 
   }
 
