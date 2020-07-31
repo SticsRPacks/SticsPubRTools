@@ -178,7 +178,7 @@ find_stics_names <- function() {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      output$table <- DT::renderDataTable(datatable(names_table(),
+      output$table <- DT::renderDataTable(DT::datatable(names_table(),
                                                     options = list(searching = FALSE),
                                                     caption = "Click on lines to select or unselect"),
                                           server = TRUE)
@@ -197,7 +197,7 @@ find_stics_names <- function() {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      output$table <- DT::renderDataTable(datatable(names_table(),
+      output$table <- DT::renderDataTable(DT::datatable(names_table(),
                                                     options = list(searching = FALSE),
                                                     caption = "Click on lines to select or unselect"),
                                           server = TRUE)
@@ -218,7 +218,7 @@ find_stics_names <- function() {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      output$table <- DT::renderDataTable(datatable(names_table(),
+      output$table <- DT::renderDataTable(DT::datatable(names_table(),
                                                     options = list(searching = FALSE),
                                                     caption = "Click on lines to select or unselect"),
                                           server = TRUE)

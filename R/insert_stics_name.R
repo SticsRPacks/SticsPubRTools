@@ -37,7 +37,7 @@ get_names_list <- function(type = "par", stics_version = "last") {
 
   if (! type %in% type_list) stop()
 
-  stics_version <- SticsRFiles:::checkversion(version_name = stics_version)
+  stics_version <- SticsRFiles::checkversion(version_name = stics_version)
 
   names_var <- paste0(type, "_names")
 
