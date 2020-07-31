@@ -1,4 +1,10 @@
-#' Gadget for finding Stics names (parameters, variables)
+#' Shiny gadget for finding Stics names
+#' @description Mini user interface for searching Stics
+#' parameters or variable names and formatting them for
+#' inserting in Rmarkdown documents.
+#'
+#' @details Possible selection of different Stics versions, formatting type,
+#' and search based on partial names.
 #'
 #'
 #' @export
@@ -6,7 +12,7 @@
 # @examples
 
 find_stics_names <- function() {
-  require(SticsRFiles)
+  library(SticsRFiles)
 
   # Masquing warnings display during app execution
   options(warn=-1)
@@ -16,6 +22,7 @@ find_stics_names <- function() {
     "
   #name {
     color: blue;
+    background: #f2f2f2;
   }
   #table {
     background: #f2f2f2;
@@ -93,11 +100,21 @@ find_stics_names <- function() {
     #
     names_table <- shiny::reactive({
       #print(input$version)
+
+      #version <- names_version()
+
+      # commented bcause reverting get_names_list not to use stics environment
+      # for managing stics version data.frames
+      #l <- get_names_list(type = names_type(), stics_version = names_version())[[names_version()]]
+      l <- get_names_list(type = names_type(), stics_version = names_version())
       if (length(in_name())) {
-        l <- get_names_list(type = names_type(), stics_version = names_version())
-        id <- grepl(pattern = make_pattern(in_name(), where = "start"), x = l[[1]])
-        l[id, ]
+
+        #print(l)
+        id <- grepl(pattern = make_pattern(in_name(), where = "start"),
+                    x = l[[1]])
+        return(l[id, ])
       }
+      return(l)
     })
 
     # getting name format activation
@@ -113,7 +130,7 @@ find_stics_names <- function() {
     in_name <- shiny::reactive({input$name})
 
     # getting the name typed
-    rows_num <- shiny::reactive({dim(names_table())[1]})
+    rows_num <- shiny::reactive({nrow(names_table())})
 
     # getting the found number of par or var
     #names_number <- shiny::reactive({nrow(output$table)})
@@ -150,6 +167,9 @@ find_stics_names <- function() {
 
     # Handle the version selection on table loaded for a given type
     shiny::observeEvent(input$version, {
+
+      #print(names_table())
+
       output$table <- shiny::renderTable({
         names_table()
       }, caption = "Results",
@@ -170,11 +190,9 @@ find_stics_names <- function() {
 
       loc_table <- names_table()
 
-      if (dim(loc_table)[1] > 1) return()
+      if (rows_num() > 1 || !rows_num()) return()
 
       if (names_type() == "par") {
-        # print(names_table()$name[1])
-        # print(names_table()$kind[1])
         shiny::stopApp(insert_stics_name(name = loc_table$name[1],
                                          kind = loc_table$kind[1],
                                          format = names_format(),

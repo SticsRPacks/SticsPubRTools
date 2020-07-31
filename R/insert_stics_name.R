@@ -50,7 +50,8 @@ get_names_list <- function(type = "par", stics_version = "last") {
     SticsRFiles::sticsget(name = paste0(names_var,"$", stics_version), env_name = "stics_names")
     )
 
-  if ( ! base::is.null(names)) return(names)
+  # commented temporarily
+  #if ( ! base::is.na(names)) return(names)
 
 
   if (type == "par") {
@@ -64,6 +65,9 @@ get_names_list <- function(type = "par", stics_version = "last") {
     # For outputs.csv
     names <- SticsRFiles::get_var_info(version = stics_version)
   }
+
+  # temporarily early return, for invaludating use of environment.
+  return(names)
 
 
   # Create a variable: param_names or var_names in the stics_names environment
