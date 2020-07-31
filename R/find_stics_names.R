@@ -248,8 +248,8 @@ find_stics_names <- function() {
       if (length(lines_sel) > 1 || base::is.null(lines_sel)) return()
 
       if (names_type() == "par") {
-        print(loc_table$name[lines_sel])
-        print(loc_table$kind[lines_sel])
+        #print(loc_table$name[lines_sel])
+        #print(loc_table$kind[lines_sel])
         shiny::stopApp(insert_stics_name(name = loc_table$name[lines_sel],
                                          kind = loc_table$kind[lines_sel],
                                          # format = names_format(),

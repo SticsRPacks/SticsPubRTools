@@ -133,17 +133,25 @@ format_names <- function(names, kinds=NULL, type = "par") {
 }
 
 
-format_names_link <- function(names, kinds= NULL , type = "par") {
+format_names_link <- function(names, kinds= NULL , type = "par", target = FALSE) {
 
   formatted_names <- format_names(names = names, kinds = kinds, type = type)
 
   names_label <- get_label_from_name(names)
 
-  names_link <- sprintf("[%s]{#%s}", formatted_names, names_label )
+  fmt <- "[%s](#%s)"
+
+  if (target) fmt <- "[%s]{#%s}"
+
+  names_link <- sprintf(fmt = fmt, formatted_names, names_label )
 
   return(names_link)
 }
 
+format_names_target <- function(names, kinds= NULL , type = "par") {
+
+  return(format_names_link(names = names, kinds = kinds, type = type, target = TRUE))
+}
 
 
 dico_kind_to_index <- function( kind = NULL) {

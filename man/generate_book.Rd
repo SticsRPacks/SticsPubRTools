@@ -4,7 +4,12 @@
 \alias{generate_book}
 \title{Generating a bookdown document or a part of}
 \usage{
-generate_book(input_rmd = NULL, book_pkg_dir = getwd(), output_format = NULL)
+generate_book(
+  input_rmd = NULL,
+  book_pkg_dir = getwd(),
+  output_format = NULL,
+  params = NULL
+)
 }
 \arguments{
 \item{input_rmd}{Chapter Rmd file name (optional)}
@@ -13,6 +18,9 @@ generate_book(input_rmd = NULL, book_pkg_dir = getwd(), output_format = NULL)
 
 \item{output_format}{String defining the type of document to build
 (optional, default: "bookdown::html_document2")}
+
+\item{params}{A list containing parameters to pass to the Rmd
+document to partameterize the output}
 }
 \value{
 A success status of the document generation

@@ -4,6 +4,8 @@
 #' @param book_pkg_dir Book package directory path (optional, default: current directory)
 #' @param output_format String defining the type of document to build
 #' (optional, default: "bookdown::html_document2")
+#' @param params A list containing parameters to pass to the Rmd
+#' document to partameterize the output
 #'
 #' @description The generation of an entire book is performed without
 #' any given arguments using the current directory which must be an
@@ -27,7 +29,8 @@
 #'
 generate_book <- function(input_rmd = NULL,
                           book_pkg_dir = getwd(),
-                          output_format = NULL ) {
+                          output_format = NULL,
+                          params = NULL) {
 
   book_name <- "book"
   full_book <- TRUE
@@ -59,10 +62,10 @@ generate_book <- function(input_rmd = NULL,
   # Build execution relative to input content
   ret <- try(
     if (full_book) {
-      bookdown::render_book(input = input_rmd, output_format = doc_format)
+      bookdown::render_book(input = input_rmd, output_format = doc_format, params = params)
       #output_dir <- get_output_dir()
     } else {
-      bookdown::preview_chapter(input = input_rmd, output_format = doc_format)
+      bookdown::preview_chapter(input = input_rmd, output_format = doc_format, params = params)
       #output_dir <- book_pkg_dir
     })
 
