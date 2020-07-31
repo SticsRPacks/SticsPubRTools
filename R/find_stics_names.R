@@ -34,6 +34,9 @@ find_stics_names <- function() {
     background-color:#337ab7;
     color:#e8f0f7;
   }
+  #cancel {
+    background-color:#A9A9A9;
+  }
   "
   stics_versions <- SticsRFiles::get_stics_versions_compat()$versions_list
   last_version <- SticsRFiles::get_stics_versions_compat()$last_version
@@ -63,11 +66,14 @@ find_stics_names <- function() {
                            ),
 
                            shiny::fillRow(height = "20%",
+                                          # shiny::fillCol(
+                                          #   shiny::checkboxInput(inputId = "format", label = "Format name for RMarkdown", value = TRUE)
+                                          # ),
                                           shiny::fillCol(
-                                            shiny::checkboxInput(inputId = "format", label = "Format name for RMarkdown", value = TRUE)
+                                            shiny::checkboxInput(inputId = "starting_with", label = "Name starting with ?", value = FALSE)
                                           ),
                                           shiny::fillCol(
-                                            shiny::checkboxInput(inputId = "link", label = "Format link for RMarkdown", value = FALSE)
+                                            shiny::checkboxInput(inputId = "link", label = "Format for RMarkdown", value = TRUE)
                                           )
                            ),
 
@@ -85,7 +91,8 @@ find_stics_names <- function() {
 
                          miniUI::miniContentPanel(
                            # miniUI::gadgetTitleBar("Results"),
-                           shiny::tableOutput(outputId = "table")
+                           #shiny::tableOutput(outputId = "table")
+                           DT::dataTableOutput('table')
                          )
 
   )
@@ -96,12 +103,22 @@ find_stics_names <- function() {
     # Getting type: var or par
     names_type <- shiny::reactive({substr(input$type, start = 1, stop = 3)})
 
+    # getting search kind
+    is_starting_with <- shiny::reactive({
+
+      if (input$starting_with) {
+        "start"
+      } else {
+        NULL
+      }
+
+    })
+
+
+
     # Getting table an filtering it
     #
     names_table <- shiny::reactive({
-      #print(input$version)
-
-      #version <- names_version()
 
       # commented bcause reverting get_names_list not to use stics environment
       # for managing stics version data.frames
@@ -110,15 +127,21 @@ find_stics_names <- function() {
       if (length(in_name())) {
 
         #print(l)
-        id <- grepl(pattern = make_pattern(in_name(), where = "start"),
+        # id <- grepl(pattern = make_pattern(in_name(), where = "start"),
+        #             x = l[[1]])
+
+        id <- grepl(pattern = make_pattern(in_name(), where = is_starting_with()),
                     x = l[[1]])
+
         return(l[id, ])
       }
       return(l)
     })
 
     # getting name format activation
-    names_format <- shiny::reactive({input$format})
+    #names_format <- shiny::reactive({input$format})
+
+
 
     # getting name link format activation
     names_link <- shiny::reactive({input$link})
@@ -138,12 +161,15 @@ find_stics_names <- function() {
 
     # Handle the name typed on table selection
     shiny::observeEvent(input$name, {
-      output$table <- shiny::renderTable({
-        names_table()
-      }, caption = "Results",
-      caption.placement = getOption("xtable.caption.placement", "top"),
-      caption.width = getOption("xtable.caption.width", NULL)
-      )
+      # output$table <- shiny::renderTable({
+      #   names_table()
+      # }, caption = "Results",
+      # caption.placement = getOption("xtable.caption.placement", "top"),
+      # caption.width = getOption("xtable.caption.width", NULL)
+      # )
+
+      output$table <- DT::renderDataTable(datatable(names_table(),options = list(searching = FALSE)),
+                                          server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
                                                 " ", input$type,
@@ -152,12 +178,15 @@ find_stics_names <- function() {
 
     # Handle the type selection in dropdown list on loaded table
     shiny::observeEvent(input$type, {
-      output$table <- shiny::renderTable({
-        names_table()
-      }, caption = "Results",
-      caption.placement = getOption("xtable.caption.placement", "top"),
-      caption.width = getOption("xtable.caption.width", NULL)
-      )
+      # output$table <- shiny::renderTable({
+      #   names_table()
+      # }, caption = "Results",
+      # caption.placement = getOption("xtable.caption.placement", "top"),
+      # caption.width = getOption("xtable.caption.width", NULL)
+      # )
+
+      output$table <- DT::renderDataTable(datatable(names_table(),options = list(searching = FALSE)),
+                                          server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
                                                 " ", input$type,
@@ -168,14 +197,15 @@ find_stics_names <- function() {
     # Handle the version selection on table loaded for a given type
     shiny::observeEvent(input$version, {
 
-      #print(names_table())
+      # output$table <- shiny::renderTable({
+      #   names_table()
+      # }, caption = "Results",
+      # caption.placement = getOption("xtable.caption.placement", "top"),
+      # caption.width = getOption("xtable.caption.width", NULL)
+      # )
 
-      output$table <- shiny::renderTable({
-        names_table()
-      }, caption = "Results",
-      caption.placement = getOption("xtable.caption.placement", "top"),
-      caption.width = getOption("xtable.caption.width", NULL)
-      )
+      output$table <- DT::renderDataTable(datatable(names_table(),options = list(searching = FALSE)),
+                                          server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
                                                 " ", input$type,
@@ -186,16 +216,24 @@ find_stics_names <- function() {
     # Handle the Insert button being pressed.
     shiny::observeEvent(input$insert, {
 
-      # print(names_type())
 
       loc_table <- names_table()
 
-      if (rows_num() > 1 || !rows_num()) return()
+      #if (rows_num() > 1 || !rows_num()) return()
+
+      lines_sel <- input$table_rows_selected
+
+      #print(lines_sel)
+
+      if (length(lines_sel) > 1 || base::is.null(lines_sel)) return()
 
       if (names_type() == "par") {
-        shiny::stopApp(insert_stics_name(name = loc_table$name[1],
-                                         kind = loc_table$kind[1],
-                                         format = names_format(),
+        print(loc_table$name[lines_sel])
+        print(loc_table$kind[lines_sel])
+        shiny::stopApp(insert_stics_name(name = loc_table$name[lines_sel],
+                                         kind = loc_table$kind[lines_sel],
+                                         # format = names_format(),
+                                         format =TRUE,
                                          link = names_link(),
                                          type = "par"
         ))
@@ -203,8 +241,9 @@ find_stics_names <- function() {
 
       if (names_type() == "var") {
         # print(names_table()$variable[1])
-        shiny::stopApp(insert_stics_name(name = loc_table$variable[1],
-                                         format = names_format(),
+        shiny::stopApp(insert_stics_name(name = loc_table$variable[lines_sel],
+                                         # format = names_format(),
+                                         format =TRUE,
                                          link = names_link(),
                                          type = "var"
         ))
@@ -220,7 +259,7 @@ find_stics_names <- function() {
 
   }
 
-  shiny::runGadget(ui, server, viewer = shiny::dialogViewer("Find and insert Stics names"))
+  shiny::runGadget(ui, server, viewer = shiny::dialogViewer("Find and insert Stics names",width = 700, height = 1000))
 
 }
 

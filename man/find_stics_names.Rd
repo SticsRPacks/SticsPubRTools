@@ -2,10 +2,16 @@
 % Please edit documentation in R/find_stics_names.R
 \name{find_stics_names}
 \alias{find_stics_names}
-\title{Gadget for finding Stics names (parameters, variables)}
+\title{Shiny gadget for finding Stics names}
 \usage{
 find_stics_names()
 }
 \description{
-Gadget for finding Stics names (parameters, variables)
+Mini user interface for searching Stics
+parameters or variable names and formatting them for
+inserting in Rmarkdown documents.
+}
+\details{
+Possible selection of different Stics versions, formatting type,
+and search based on partial names.
 }

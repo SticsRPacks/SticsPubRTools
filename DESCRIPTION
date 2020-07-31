@@ -26,4 +26,5 @@ Imports:
     shiny,
     miniUI,
     ggplot2,
-    tibble
+    tibble,
+    DT
