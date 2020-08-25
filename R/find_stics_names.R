@@ -76,7 +76,7 @@ find_stics_names <- function() {
                                             shiny::checkboxInput(inputId = "starting_with", label = "Name starting with ?", value = FALSE)
                                           ),
                                           shiny::fillCol(
-                                            shiny::checkboxInput(inputId = "link", label = "Format for RMarkdown", value = TRUE)
+                                            shiny::checkboxInput(inputId = "link", label = "Rmarkdown name formating for inline use (uncheck for equation)", value = TRUE)
                                           )
                            ),
                            shiny::fillRow(height = "20%",
@@ -143,7 +143,7 @@ find_stics_names <- function() {
         id <- grepl(pattern = make_pattern(in_name(), where = is_starting_with()),
                     x = l[[1]])
 
-        return(l[id, ])
+        return(l[id,])
       }
       return(l)
     })
@@ -178,9 +178,11 @@ find_stics_names <- function() {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      output$table <- DT::renderDataTable(DT::datatable(names_table(),
+      dt_names <- names_table()[,1:3]
+
+      output$table <- DT::renderDataTable(DT::datatable(dt_names,
                                                     options = list(searching = FALSE),
-                                                    caption = "Click on lines to select or unselect"),
+                                                    caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
@@ -197,9 +199,11 @@ find_stics_names <- function() {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      output$table <- DT::renderDataTable(DT::datatable(names_table(),
+      dt_names <- names_table()[,1:3]
+
+      output$table <- DT::renderDataTable(DT::datatable(dt_names,
                                                     options = list(searching = FALSE),
-                                                    caption = "Click on lines to select or unselect"),
+                                                    caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
@@ -218,15 +222,39 @@ find_stics_names <- function() {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      output$table <- DT::renderDataTable(DT::datatable(names_table(),
+      dt_names <- names_table()[,1:3]
+
+      output$table <- DT::renderDataTable(DT::datatable(dt_names,
                                                     options = list(searching = FALSE),
-                                                    caption = "Click on lines to select or unselect"),
+                                                    caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
                                                 " ", input$type,
                                                 '(s) found'))
 
+    })
+
+    # Handle filtering names stating with typed
+    # string in name
+    shiny::observeEvent(input$starting_with, {
+      # output$table <- shiny::renderTable({
+      #   names_table()
+      # }, caption = "Results",
+      # caption.placement = getOption("xtable.caption.placement", "top"),
+      # caption.width = getOption("xtable.caption.width", NULL)
+      # )
+
+      dt_names <- names_table()[,1:3]
+
+      output$table <- DT::renderDataTable(DT::datatable(dt_names,
+                                                        options = list(searching = FALSE),
+                                                        caption = "Click on a line to select or unselect it"),
+                                          server = TRUE)
+
+      output$number <- shiny::renderText(paste0(as.character(rows_num()),
+                                                " ", input$type,
+                                                '(s) found'))
     })
 
     # Handle the Insert button being pressed.
@@ -240,7 +268,7 @@ find_stics_names <- function() {
       lines_sel <- input$table_rows_selected
 
       if(base::is.null(lines_sel)) {
-        output$indication <- shiny::renderText("Click on lines to select or unselect a row before inserting !")
+        output$indication <- shiny::renderText("Click in one line to select it before inserting !")
       }
 
       #print(lines_sel)
@@ -279,7 +307,7 @@ find_stics_names <- function() {
 
   }
 
-  shiny::runGadget(ui, server, viewer = shiny::dialogViewer("Find and insert Stics names",width = 700, height = 1000))
+  shiny::runGadget(ui, server, viewer = shiny::dialogViewer("Find and insert Stics names"))#,width = 700, height = 2000))
 
 }
 
