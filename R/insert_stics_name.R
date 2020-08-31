@@ -41,18 +41,17 @@ get_names_list <- function(type = "par", stics_version = "last") {
 
   names_var <- paste0(type, "_names")
 
-  # Creating stics_names env in stics env
-  if ( ! SticsRFiles::sticsexists(name = "stics_names") ) SticsRFiles::sticsenv(name = "stics_names")
-
-  # If the variable param_names or var_names in the stics_names
-  # environment, returning the value got from the environment.
-  names <- suppressWarnings(
-    SticsRFiles::sticsget(name = paste0(names_var,"$", stics_version), env_name = "stics_names")
-  )
-
-  # commented temporarily
+  # ----------------- commented: starting section using stics environment function ------------------#
+  # # Creating stics_names env in stics env
+  # if ( ! SticsRFiles::sticsexists(name = "stics_names") ) SticsRFiles::sticsenv(name = "stics_names")
+  #
+  # # If the variable param_names or var_names in the stics_names
+  # # environment, returning the value got from the environment.
+  # names <- suppressWarnings(
+  #   SticsRFiles::sticsget(name = paste0(names_var,"$", stics_version), env_name = "stics_names")
+  # )
   #if ( ! base::is.na(names)) return(names)
-
+  # ----------------- commented: ending section using stics environment function ------------------#
 
   if ( type == "par" ) {
     # For inputs.csv
@@ -66,20 +65,22 @@ get_names_list <- function(type = "par", stics_version = "last") {
     names <- SticsRFiles::get_var_info(version = stics_version)
   }
 
-  # temporarily early return, for invalidating use of environment.
+  # temporarily early return, without using of environment.
   return(names)
 
 
-  # Create a variable: param_names or var_names in the stics_names environment
-  if (! SticsRFiles::sticsexists(name = names_var, env_name = "stics_names")) {
-    SticsRFiles::sticsset(name = names_var,
-                          value = list(),
-                          env_name = "stics_names")
-  }
-
-  SticsRFiles::sticsset(name = paste0(names_var,"$", stics_version),
-                        value = names,
-                        env_name = "stics_names")
+  # ----------------- section using stics environment function commented ------------------#
+  # # Create a variable: param_names or var_names in the stics_names environment
+  # if (! SticsRFiles::sticsexists(name = names_var, env_name = "stics_names")) {
+  #   SticsRFiles::sticsset(name = names_var,
+  #                         value = list(),
+  #                         env_name = "stics_names")
+  # }
+  #
+  # SticsRFiles::sticsset(name = paste0(names_var,"$", stics_version),
+  #                       value = names,
+  #                       env_name = "stics_names")
+  # ----------------- commented: ending section using stics environment function ------------------#
 
   # the first column: name for par, variable for var
   if ( !base::is.null(names) & length(names) ) return(names)
