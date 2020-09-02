@@ -73,28 +73,42 @@ gen_bibtex_file <- function( file_path = NULL ,
 # i.e. : gen_livre_rouge_bibtex_file, gen_stics_bibtex_file !
 
 
-get_references <- function(library, query = "", query_type = "basic", verbose = FALSE) {
+get_references <- function(library,
+                           collection = NULL,
+                           query = "", query_type = "basic", verbose = FALSE) {
 
   # Fixing options for just warning
   RefManageR::BibOptions(check.entries = "warn")
 
   # First query (will contain the merged queries resutls in the end)
-  BibEntry_obj_full <- read_zotero_references( library = library, query = query, query_type = query_type)
+  BibEntry_obj_full <- read_zotero_references( library = library,
+                                               collection = collection,
+                                               query = query, query_type = query_type)
 
   # if no references found
   if(base::is.null(BibEntry_obj_full)) return()
 
+  start <- 1
+  if(verbose) cat(paste0("start: ",start))
+
   # Starting a multiple query and requests merging
-  start <- length(BibEntry_obj_full) + 1
+  n_ref <- length(BibEntry_obj_full)
+  if (verbose) cat(paste0("nb ref: ",n_ref))
+  start <- n_ref + 1
+
 
   while (TRUE) {
 
-    if(verbose) print(start)
+    if(verbose) cat(paste0("start: ",start))
 
-    BibEntry_obj <- read_zotero_references( library = library, query = query, query_type = query_type, start = start)
+    BibEntry_obj <- read_zotero_references( library = library,
+                                            collection = collection,
+                                            query = query, query_type = query_type, start = start)
 
     # Reference number got from the query
     n_ref <-  length(BibEntry_obj)
+
+    if (verbose) cat(paste0("nb ref: ",n_ref))
 
     # No more references in the base from start id value
     if (!n_ref) break
@@ -116,17 +130,23 @@ get_references <- function(library, query = "", query_type = "basic", verbose = 
 
 # @param start A numeric indicating from which record number in the base to start the query
 
-read_zotero_references <- function(library, query = "", query_type = "basic", start = 1) {
+read_zotero_references <- function(library, collection = NULL,
+                                   query = "", query_type = "basic", start = 1, number = NULL) {
 
   #group_id <- "2450934" # livre_rouge
   group_id <- get_group_id(group_name = library)
 
   if (base::is.null(group_id)) stop("Unknown library name",library)
 
-  params <- get_query_params( query = query, query_type = query_type, start = start)
+  params <- get_query_params( query = query, query_type = query_type, start = start,
+                              collection = collection, limit = number)
 
+  # r <- RefManageR::ReadZotero(user = "6367394",
+  #                             .params = params,
+  #                             delete.file = FALSE)
   r <- RefManageR::ReadZotero(group = group_id,
                               .params = params)
+
   return(r)
 }
 
@@ -136,22 +156,27 @@ get_query_params <- function( key = NULL,
                               query_type = "basic",
                               start = 1,
                               collection = NULL,
-                              item_type = NULL) {
+                              item_type = NULL,
+                              limit = NULL) {
 
   qmode <- get_query_mode(query_type = query_type)
 
   if (base::is.null(qmode)) stop("Unknown query mode (basic, full)")
 
   # Getting a default read access API key
-  if (base::is.null(key)) key <- get_access_key(access = "write")
+  if (base::is.null(key)) key <- get_access_key()
 
   # Base params list
   params <- list( q = query, key = key, qmode = qmode , start = start)
 
   # Specific params
-  if (!base::is.null(collection)) params$collection <- collection # collection name !
+  if (!base::is.null(collection)) {
+    params$collection <- get_collection_id(collection_name = collection)
+  }
 
   if (!base::is.null(item_type)) params$itemType <- item_type
+
+  if (!base::is.null(limit)) params$limit <- limit
 
   return(params)
 }
@@ -167,13 +192,31 @@ get_group_id <- function(group_name = NULL) {
 
 }
 
-
 get_groups <- function() {
   groups <- list()
   groups$livre_rouge <- "2450934"
   groups$equipe_projet_stics <- "857933"
 
   return(groups)
+}
+
+
+get_collection_id <- function(collection_name = NULL) {
+
+  collections <- get_collections()
+
+  if (!collection_name %in% names(collections)) return()
+
+  return(collections[[collection_name]])
+
+}
+
+get_collections <- function() {
+  collections <- list()
+  collections$sticsredbook2020 <- "5BN7SQTX"
+  collections$EPS_stics <- "HWSYUI79"
+
+  return(collections)
 }
 
 get_access_key <- function(access = "read") {
