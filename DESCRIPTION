@@ -27,4 +27,5 @@ Imports:
     miniUI,
     ggplot2,
     tibble,
-    DT
+    DT,
+    rstudioapi
