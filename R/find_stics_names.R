@@ -289,7 +289,7 @@ find_stics_names <- function() {
 
       if (names_type() == "var") {
         # print(names_table()$variable[1])
-        shiny::stopApp(insert_stics_name(name = loc_table$variable[lines_sel],
+        shiny::stopApp(insert_stics_name(name = loc_table$name[lines_sel],
                                          # format = names_format(),
                                          format =TRUE,
                                          link = names_link(),

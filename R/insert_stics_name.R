@@ -143,11 +143,14 @@ format_names_link <- function(names, kinds = NULL , type = "par", target = FALSE
   formatted_names <- format_names(names = names, kinds = kinds, type = type, inline = inline)
 
   names_label <- get_label_from_name(names)
-  fmt <- "[%s](#%s-%s)"
 
-  if ( target ) fmt <- "[%s]{#%s-%s}"
-
-  names_link <- sprintf(fmt = fmt, formatted_names, type, names_label )
+  if ( target ) {
+    fmt <- "[%s]{#%s-%s}"
+    names_link <- sprintf(fmt = fmt, formatted_names, type, names_label )
+  } else {
+    fmt <- "[%s](#%s-%s) \\index{%s}"
+    names_link <- sprintf(fmt = fmt, formatted_names, type, names_label, names )
+  }
 
   return(names_link)
 }
