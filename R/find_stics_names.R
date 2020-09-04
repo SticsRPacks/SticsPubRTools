@@ -44,6 +44,10 @@ find_stics_names <- function() {
   stics_versions <- SticsRFiles::get_stics_versions_compat()$versions_list
   last_version <- SticsRFiles::get_stics_versions_compat()$last_version
 
+  prev_text_sel <- get_doc_word_selection()
+  in_text <- ""
+  if (!base::is.null(prev_text_sel)) in_text <- prev_text_sel$text
+
   ui <- miniUI::miniPage(title = "Stics names",
                          shiny::tags$style(css),
                          miniUI::miniTitleBar(title = "Search a Stics parameter or variable"
@@ -64,7 +68,8 @@ find_stics_names <- function() {
                            shiny::fillRow(height = "35%",
                                           shiny::fillCol(
                                             shiny::textInput(inputId = "name", label = shiny::strong("Searched name") ,
-                                                             width = "80%" , placeholder = "Enter a name or a part of")
+                                                             width = "80%" , placeholder = "Enter a name or a part of",
+                                                             value = in_text)
                                           )
                            ),
 
