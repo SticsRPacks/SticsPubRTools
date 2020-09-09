@@ -1,59 +1,101 @@
-#' Generating a BibTex file using a query to a Zotero web base
+#' Generating a BibTex file using a query to a Zotero web library
 #'
-#' @param file_path A BibTex file path (with a .bib extension)
-#' @param library A group library name (appearing in groups in Zotero web)
-#' @param query A character string to use for querying bibliographic base
-#' @param query_type A query type: "full" (the default) for searching in all the fields,
-#' or "basic" for searching only in title, creator, year fields
-#' @param verbose A logical for displaying messages from the query process (TRUE) or not (FALSE)
-#' @param overwrite A logical for deleting existing file (TRUE), or not (FALSE, default)
+#' @param file_dir Optional, a BibTex file directory path (default: current)
+#' @param library_name A group library name (appearing in groups in Zotero web)
+#' @param collection_name Optional, a collection name (or vector of) belonging to the library
+#' @param query Optional, a character string to use for querying bibliographic base
+#' @param query_type Optional, a query type: "full" (the default) for searching
+#' in all the fields, or "basic" for searching only in title, creator, year fields
+#' @param verbose Optional, a logical used for displaying messages
+#' from the query process (TRUE) or not (FALSE)
+#' @param overwrite Optional, a logical for deleting existing file (TRUE),
+#' or not (FALSE, default)
 #'
-#@return
+#' @return An invisible BibEntry object or a list of
+#'
+#' @details The output file name(s) is/are either the library name (if not any collection are
+#' given) or the collection name(s)
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #'
-#' # No query
-#' gen_bibtex_file("file.bib")
+#' # No collection
+#' gen_bibtex_file(library_name = "GroupLibraryName")
 #'
-#' # with query, searching in all fields
-#' gen_bibtex_file(file = "file.bib", query = "1995" )
+#' # With a collection name
+#' gen_bibtex_file(library_name = "GroupLibraryName", collection_name = "CollName")
 #'
-#' # searching in basic fields (title, creator, year)
-#' gen_bibtex_file(file = "file.bib", query = "1995", query_type = "basic" )
+#' # With query, searching in all fields
+#' gen_bibtex_file(library_name = "GroupLibraryName",
+#' collection_name = "CollName", query = "1995" )
 #'
-#' # getting returned BibEntry object
-#' bibentry_obj <- gen_bibtex_file("file.bib")
+#' # Getting returned BibEntry object
+#' bibentry_obj <- gen_bibtex_file(library_name = "GroupLibraryName")
 #'
 #'}
 #'
 #'
-gen_bibtex_file <- function( file_path = NULL ,
-                             library = "livre_rouge",
+gen_bibtex_file <- function( file_dir = getwd(),
+                             library_name,
+                             collection_name = NULL,
                              query = "",
                              query_type ="full",
                              verbose = FALSE,
                              overwrite = FALSE) {
 
-  # Checking file + .bib extension
-  if (base::is.null(file_path)) stop("File path is missing !")
+  # loop over file_path content !
+  if (length(collection_name) > 1) {
+    BibEntry_objs <-list()
+    for (i in 1:length(collection_name)){
+      BibEntry_objs[[i]] <-
+        gen_bibtex_file(file_dir = file_dir,
+                        library_name = library_name,
+                        collection_name = collection_name[i],
+                        query = query,
+                        query_type = query_type,
+                        verbose = verbose,
+                        overwrite = overwrite)
+    }
+    return(invisible(BibEntry_objs))
+  }
 
-  if (!grepl(pattern = "\\.bib$", x = file_path)) stop("The file must have a .bib extension !")
+  bib_src <- library_name
+
+  if (! base::is.null(collection_name)) {
+    bib_src <- collection_name
+  }
+
+  file_path <- file.path(file_dir, paste0(bib_src, ".bib"))
+
+  if (verbose) {
+    cat(paste0("Getting references from collection: ", bib_src))
+    #cat(paste0("generating BibTex file: ",file_path))
+  }
 
   # Checking file, against overwrite arg.
   if ( file.exists(file_path) ) {
     if (overwrite) {
       unlink(x = file_path)
     } else {
-      stop("Consider to use overwrite = TRUE, for overwriting the existing file !")
+      warning(file_path,
+              ": file already exists",
+              " consider to use overwrite = TRUE",
+              " for overwriting it !")
+      return(invisible())
     }
   }
 
 
+
+
   # Getting BibEntry of all references from the zotero base
-  BibEntry_obj <- get_references(library = library, query = query, query_type = query_type)
+  BibEntry_obj <- get_references(library_name = library_name,
+                                 collection_name = collection_name,
+                                 query = query,
+                                 query_type = query_type,
+                                 verbose = verbose)
 
   # Checking content, aborting if NULL
   if(base::is.null(BibEntry_obj)) stop("Not any references returned by the query !")
@@ -62,34 +104,81 @@ gen_bibtex_file <- function( file_path = NULL ,
   RefManageR::WriteBib( bib = BibEntry_obj,
                         file = file_path,
                         biblatex = FALSE,
-                        verbose = verbose)
+                        verbose = TRUE)
 
   # Returning bib list as BibEntry object
   return(invisible(BibEntry_obj))
 }
 
 
+
+#' Generating or updating silently a BibTex file or a list of,
+#' using a Zotero web library
+#'
+#' @param file_dir Optional, a BibTex file directory path (default: current)
+#' @param library_name A group library name (appearing in groups in Zotero web)
+#' @param collection_name Optional, a collection name (or vector of) belonging to the library
+#' @param query Optional, a character string to use for querying bibliographic base
+#' @param query_type Optional, a query type: "full" (the default) for searching
+#' in all the fields, or "basic" for searching only in title, creator, year fields
+#'
+#' @return An invisible BibEntry object or a list of
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # For the default collection names vector
+#' update_stics_bibtex_files()
+#'
+#' # For the hole library_name
+#' update_stics_bibtex_files(collection_name = NULL)
+#'
+#'}
+#'
+#'
+update_stics_bibtex_files <- function(file_dir = getwd(),
+                                      library_name = "livre_rouge",
+                                      collection_name = c("sticsredbook2020", "EPS_stics"),
+                                      query = "",
+                                      query_type ="full") {
+  suppressWarnings(suppressMessages(
+    gen_bibtex_file(file_dir = file_dir,
+                    library_name = library_name,
+                    collection_name = collection_name,
+                    query = query,
+                    query_type = query_type,
+                    overwrite = TRUE,
+                    verbose = FALSE)
+
+  ))
+}
+
 #TODO: see if specific functions may be added
 # i.e. : gen_livre_rouge_bibtex_file, gen_stics_bibtex_file !
 
 
-get_references <- function(library,
-                           collection = NULL,
-                           query = "", query_type = "basic", verbose = FALSE) {
+get_references <- function(library_name,
+                           collection_name = NULL,
+                           query = "",
+                           query_type = "basic",
+                           verbose = FALSE) {
 
   # Fixing options for just warning
   RefManageR::BibOptions(check.entries = "warn")
 
   # First query (will contain the merged queries resutls in the end)
-  BibEntry_obj_full <- read_zotero_references( library = library,
-                                               collection = collection,
-                                               query = query, query_type = query_type)
+  BibEntry_obj_full <- read_zotero_references( library_name = library_name,
+                                               collection_name = collection_name,
+                                               query = query,
+                                               query_type = query_type)
 
   # if no references found
   if(base::is.null(BibEntry_obj_full)) return()
 
   start <- 1
-  if(verbose) cat(paste0("start: ",start))
+  #if(verbose) cat(paste0("start: ",start))
 
   # Starting a multiple query and requests merging
   n_ref <- length(BibEntry_obj_full)
@@ -99,16 +188,18 @@ get_references <- function(library,
 
   while (TRUE) {
 
-    if(verbose) cat(paste0("start: ",start))
+    #if(verbose) cat(paste0("start: ",start))
 
-    BibEntry_obj <- read_zotero_references( library = library,
-                                            collection = collection,
-                                            query = query, query_type = query_type, start = start)
+    BibEntry_obj <- read_zotero_references( library_name = library_name,
+                                            collection_name = collection_name,
+                                            query = query,
+                                            query_type = query_type,
+                                            start = start)
 
     # Reference number got from the query
     n_ref <-  length(BibEntry_obj)
 
-    if (verbose) cat(paste0("nb ref: ",n_ref))
+    #if (verbose) cat(paste0("nb ref: ",n_ref))
 
     # No more references in the base from start id value
     if (!n_ref) break
@@ -130,24 +221,32 @@ get_references <- function(library,
 
 # @param start A numeric indicating from which record number in the base to start the query
 
-read_zotero_references <- function(library, collection = NULL,
-                                   query = "", query_type = "basic", start = 1, number = NULL) {
+read_zotero_references <- function(library_name,
+                                   collection_name = NULL,
+                                   query = "",
+                                   query_type = "basic",
+                                   start = 1,
+                                   number = NULL) {
 
-  #group_id <- "2450934" # livre_rouge
-  group_id <- get_group_id(group_name = library)
+  #group_id , see get_groups for ids by group names list
+  group_id <- get_group_id(group_name = library_name)
 
-  if (base::is.null(group_id)) stop("Unknown library name",library)
+  if (base::is.null(group_id)) stop("Unknown library name",library_name)
 
-  params <- get_query_params( query = query, query_type = query_type, start = start,
-                              collection = collection, limit = number)
+  params <- get_query_params( query = query,
+                              query_type = query_type,
+                              start = start,
+                              collection_name = collection_name,
+                              limit = number)
 
-  # r <- RefManageR::ReadZotero(user = "6367394",
-  #                             .params = params,
-  #                             delete.file = FALSE)
-  r <- RefManageR::ReadZotero(group = group_id,
-                              .params = params)
+  invisible(capture.output(
+    r <- RefManageR::ReadZotero(group = group_id, .params = params)
+  ))
 
-  return(r)
+  #r <- RefManageR::ReadZotero(group = group_id, .params = params)
+
+
+  return(invisible(r))
 }
 
 
@@ -155,7 +254,7 @@ get_query_params <- function( key = NULL,
                               query="",
                               query_type = "basic",
                               start = 1,
-                              collection = NULL,
+                              collection_name = NULL,
                               item_type = NULL,
                               limit = NULL) {
 
@@ -170,8 +269,8 @@ get_query_params <- function( key = NULL,
   params <- list( q = query, key = key, qmode = qmode , start = start)
 
   # Specific params
-  if (!base::is.null(collection)) {
-    params$collection <- get_collection_id(collection_name = collection)
+  if (!base::is.null(collection_name)) {
+    params$collection <- get_collection_id(collection_name = collection_name)
   }
 
   if (!base::is.null(item_type)) params$itemType <- item_type

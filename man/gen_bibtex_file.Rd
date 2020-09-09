@@ -2,11 +2,12 @@
 % Please edit documentation in R/bibliography.R
 \name{gen_bibtex_file}
 \alias{gen_bibtex_file}
-\title{Generating a BibTex file using a query to a Zotero web base}
+\title{Generating a BibTex file using a query to a Zotero web library}
 \usage{
 gen_bibtex_file(
-  file_path = NULL,
-  library = "livre_rouge",
+  file_dir = getwd(),
+  library_name,
+  collection_name = NULL,
   query = "",
   query_type = "full",
   verbose = FALSE,
@@ -14,36 +15,48 @@ gen_bibtex_file(
 )
 }
 \arguments{
-\item{file_path}{A BibTex file path (with a .bib extension)}
+\item{file_dir}{Optional, a BibTex file directory path (default: current)}
 
-\item{library}{A group library name (appearing in groups in Zotero web)}
+\item{library_name}{A group library name (appearing in groups in Zotero web)}
 
-\item{query}{A character string to use for querying bibliographic base}
+\item{collection_name}{Optional, a collection name (or vector of) belonging to the library}
 
-\item{query_type}{A query type: "full" (the default) for searching in all the fields,
-or "basic" for searching only in title, creator, year fields}
+\item{query}{Optional, a character string to use for querying bibliographic base}
 
-\item{verbose}{A logical for displaying messages from the query process (TRUE) or not (FALSE)}
+\item{query_type}{Optional, a query type: "full" (the default) for searching
+in all the fields, or "basic" for searching only in title, creator, year fields}
 
-\item{overwrite}{A logical for deleting existing file (TRUE), or not (FALSE, default)}
+\item{verbose}{Optional, a logical used for displaying messages
+from the query process (TRUE) or not (FALSE)}
+
+\item{overwrite}{Optional, a logical for deleting existing file (TRUE),
+or not (FALSE, default)}
+}
+\value{
+An invisible BibEntry object or a list of
 }
 \description{
-Generating a BibTex file using a query to a Zotero web base
+Generating a BibTex file using a query to a Zotero web library
+}
+\details{
+The output file name(s) is/are either the library name (if not any collection are
+given) or the collection name(s)
 }
 \examples{
 \dontrun{
 
-# No query
-gen_bibtex_file("file.bib")
+# No collection
+gen_bibtex_file(library_name = "GroupLibraryName")
 
-# with query, searching in all fields
-gen_bibtex_file(file = "file.bib", query = "1995" )
+# With a collection name
+gen_bibtex_file(library_name = "GroupLibraryName", collection_name = "CollName")
 
-# searching in basic fields (title, creator, year)
-gen_bibtex_file(file = "file.bib", query = "1995", query_type = "basic" )
+# With query, searching in all fields
+gen_bibtex_file(library_name = "GroupLibraryName",
+collection_name = "CollName", query = "1995" )
 
-# getting returned BibEntry object
-bibentry_obj <- gen_bibtex_file("file.bib")
+# Getting returned BibEntry object
+bibentry_obj <- gen_bibtex_file(library_name = "GroupLibraryName")
 
 }
 
