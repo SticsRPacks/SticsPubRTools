@@ -177,7 +177,7 @@ get_references <- function(library_name,
   # if no references found
   if(base::is.null(BibEntry_obj_full)) return()
 
-  start <- 1
+  start <- NULL
   #if(verbose) cat(paste0("start: ",start))
 
   # Starting a multiple query and requests merging
@@ -195,6 +195,8 @@ get_references <- function(library_name,
                                             query = query,
                                             query_type = query_type,
                                             start = start)
+
+    #print(BibEntry_obj)
 
     # Reference number got from the query
     n_ref <-  length(BibEntry_obj)
@@ -225,7 +227,7 @@ read_zotero_references <- function(library_name,
                                    collection_name = NULL,
                                    query = "",
                                    query_type = "basic",
-                                   start = 1,
+                                   start = NULL,
                                    number = NULL) {
 
   #group_id , see get_groups for ids by group names list
@@ -243,7 +245,8 @@ read_zotero_references <- function(library_name,
     r <- RefManageR::ReadZotero(group = group_id, .params = params)
   ))
 
-  #r <- RefManageR::ReadZotero(group = group_id, .params = params)
+  #r <- RefManageR::ReadZotero(group = group_id, .params = params, delete.file = FALSE)
+
 
 
   return(invisible(r))
@@ -253,7 +256,7 @@ read_zotero_references <- function(library_name,
 get_query_params <- function( key = NULL,
                               query="",
                               query_type = "basic",
-                              start = 1,
+                              start = NULL,
                               collection_name = NULL,
                               item_type = NULL,
                               limit = NULL) {
@@ -266,9 +269,11 @@ get_query_params <- function( key = NULL,
   if (base::is.null(key)) key <- get_access_key()
 
   # Base params list
-  params <- list( q = query, key = key, qmode = qmode , start = start)
+  params <- list( q = query, key = key, qmode = qmode)
 
   # Specific params
+  if (!base::is.null(start)) params$start <- start
+
   if (!base::is.null(collection_name)) {
     params$collection <- get_collection_id(collection_name = collection_name)
   }
