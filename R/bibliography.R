@@ -70,7 +70,7 @@ gen_bibtex_file <- function( file_dir = getwd(),
   file_path <- file.path(file_dir, paste0(bib_src, ".bib"))
 
   if (verbose) {
-    cat(paste0("Getting references from collection: ", bib_src))
+    cat(sprintf("%s: %s\n","Getting references from collection", bib_src))
     #cat(paste0("generating BibTex file: ",file_path))
   }
 
@@ -105,6 +105,15 @@ gen_bibtex_file <- function( file_dir = getwd(),
                         file = file_path,
                         biblatex = FALSE,
                         verbose = TRUE)
+
+  if (verbose) {
+    cat(sprintf("%s %s %s: %s\n",
+                "Writing",
+                as.character(length(BibEntry_obj)),
+                "references to file",
+                file_path))
+    #cat(paste0("generating BibTex file: ",file_path))
+  }
 
   # Returning bib list as BibEntry object
   return(invisible(BibEntry_obj))
@@ -150,7 +159,7 @@ update_stics_bibtex_files <- function(file_dir = getwd(),
                     query = query,
                     query_type = query_type,
                     overwrite = TRUE,
-                    verbose = FALSE)
+                    verbose = TRUE)
 
   ))
 }
@@ -182,7 +191,7 @@ get_references <- function(library_name,
 
   # Starting a multiple query and requests merging
   n_ref <- length(BibEntry_obj_full)
-  if (verbose) cat(paste0("nb ref: ",n_ref))
+  # if (verbose) cat(paste0("nb ref: ",n_ref))
   start <- n_ref + 1
 
 
