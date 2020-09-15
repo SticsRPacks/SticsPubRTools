@@ -54,7 +54,7 @@ find_stics_names <- function() {
                          ),
                          miniUI::miniContentPanel(
 
-                           shiny::fillRow(height = "35%",
+                           shiny::fillRow(height = "30%",
                                           shiny::fillCol(width = "70%",
                                                          shiny::selectInput(inputId = "type", label = shiny::strong("Type of name"),
                                                                             choices = c("variable", "parameter"),selected = "parameter")
@@ -65,7 +65,7 @@ find_stics_names <- function() {
                                                                             selected = last_version))
                            ),
 
-                           shiny::fillRow(height = "35%",
+                           shiny::fillRow(height = "30%",
                                           shiny::fillCol(
                                             shiny::textInput(inputId = "name", label = shiny::strong("Searched name") ,
                                                              width = "80%" , placeholder = "Enter a name or a part of",
@@ -81,18 +81,23 @@ find_stics_names <- function() {
                                             shiny::checkboxInput(inputId = "starting_with", label = "Name starting with ?", value = FALSE)
                                           ),
                                           shiny::fillCol(
+                                            shiny::checkboxInput(inputId = "case_sensitive", label = "Case sentitive", value = FALSE)
+                                          ),
+                                          shiny::fillCol(
                                             shiny::checkboxInput(inputId = "link", label = "Rmarkdown name formating for inline use (uncheck for equation)", value = TRUE)
                                           )
                            ),
-                           shiny::fillRow(height = "20%",
-
+                           shiny::fillRow(height = "10%",
                                           shiny::fillCol(
                                             shiny::textOutput(outputId = "number")
-                                          ),
+                                          )
+                           ),
+                           shiny::fillRow(height = "10%",
                                           shiny::fillCol(
                                             shiny::textOutput(outputId = "indication")
                                           )
                            )
+
                          ),
 
                          miniUI::miniButtonBlock(
@@ -118,7 +123,7 @@ find_stics_names <- function() {
     # Getting type: var or par
     names_type <- shiny::reactive({substr(input$type, start = 1, stop = 3)})
 
-    # getting search kind
+    # Getting search kind: name starting with string or not
     is_starting_with <- shiny::reactive({
 
       if (input$starting_with) {
@@ -130,6 +135,8 @@ find_stics_names <- function() {
     })
 
 
+    # Case sensitive
+    case_sensitive <- shiny::reactive({input$case_sensitive})
 
     # Getting table an filtering it
     #
@@ -139,23 +146,22 @@ find_stics_names <- function() {
       # for managing stics version data.frames
       #l <- get_names_list(type = names_type(), stics_version = names_version())[[names_version()]]
       l <- get_names_list(type = names_type(), stics_version = names_version())
+
       if (length(in_name())) {
 
-        #print(l)
-        # id <- grepl(pattern = make_pattern(in_name(), where = "start"),
-        #             x = l[[1]])
+        if (case_sensitive()) {
+          pattern <- make_pattern(in_name(), where = is_starting_with())
+          names_list <- l[[1]]
+        } else {
+          pattern <- make_pattern(tolower(in_name()), where = is_starting_with())
+          names_list <- tolower(l[[1]])
+        }
 
-        id <- grepl(pattern = make_pattern(in_name(), where = is_starting_with()),
-                    x = l[[1]])
-
+        id <- grepl(pattern = pattern, x = names_list)
         return(l[id,])
       }
       return(l)
     })
-
-    # getting name format activation
-    #names_format <- shiny::reactive({input$format})
-
 
 
     # getting name link format activation
@@ -186,8 +192,8 @@ find_stics_names <- function() {
       dt_names <- names_table()[,1:3]
 
       output$table <- DT::renderDataTable(DT::datatable(dt_names,
-                                                    options = list(searching = FALSE),
-                                                    caption = "Click on a line to select or unselect it"),
+                                                        options = list(searching = FALSE),
+                                                        caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
@@ -207,8 +213,8 @@ find_stics_names <- function() {
       dt_names <- names_table()[,1:3]
 
       output$table <- DT::renderDataTable(DT::datatable(dt_names,
-                                                    options = list(searching = FALSE),
-                                                    caption = "Click on a line to select or unselect it"),
+                                                        options = list(searching = FALSE),
+                                                        caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
@@ -230,8 +236,8 @@ find_stics_names <- function() {
       dt_names <- names_table()[,1:3]
 
       output$table <- DT::renderDataTable(DT::datatable(dt_names,
-                                                    options = list(searching = FALSE),
-                                                    caption = "Click on a line to select or unselect it"),
+                                                        options = list(searching = FALSE),
+                                                        caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
 
       output$number <- shiny::renderText(paste0(as.character(rows_num()),
@@ -240,7 +246,7 @@ find_stics_names <- function() {
 
     })
 
-    # Handle filtering names stating with typed
+    # Handle filtering names starting with typed
     # string in name
     shiny::observeEvent(input$starting_with, {
       # output$table <- shiny::renderTable({
@@ -262,6 +268,30 @@ find_stics_names <- function() {
                                                 '(s) found'))
     })
 
+
+    # # Handle filtering names using case sensitive search or not
+    # # with string in name
+    shiny::observeEvent(input$case_sensitive, {
+        # output$table <- shiny::renderTable({
+        #   names_table()
+        # }, caption = "Results",
+        # caption.placement = getOption("xtable.caption.placement", "top"),
+        # caption.width = getOption("xtable.caption.width", NULL)
+        # )
+
+        dt_names <- names_table()[,1:3]
+
+        output$table <- DT::renderDataTable(DT::datatable(dt_names,
+                                                          options = list(searching = FALSE),
+                                                          caption = "Click on a line to select or unselect it"),
+                                            server = TRUE)
+
+        output$number <- shiny::renderText(paste0(as.character(rows_num()),
+                                                  " ", input$type,
+                                                  '(s) found'))
+
+    })
+
     # Handle the Insert button being pressed.
     shiny::observeEvent(input$insert, {
 
@@ -274,45 +304,69 @@ find_stics_names <- function() {
 
       if(base::is.null(lines_sel)) {
         output$indication <- shiny::renderText("Click in one line to select it before inserting !")
+        return()
       }
 
       #print(lines_sel)
 
-      if (length(lines_sel) > 1 || base::is.null(lines_sel)) return()
+      if(length(lines_sel) > 1) {
+        output$indication <- shiny::renderText("Only one line must be selected before inserting !")
+        return()
+      }
+
+      #if (length(lines_sel) > 1 || base::is.null(lines_sel)) return()
+
+      # Clearing message if any !
+      output$indication <- shiny::renderText("")
 
       if (names_type() == "par") {
         #print(loc_table$name[lines_sel])
         #print(loc_table$kind[lines_sel])
-        shiny::stopApp(insert_stics_name(name = loc_table$name[lines_sel],
-                                         kind = loc_table$kind[lines_sel],
-                                         # format = names_format(),
-                                         format =TRUE,
-                                         link = names_link(),
-                                         type = "par"
-        ))
+        # shiny::stopApp(insert_stics_name(name = loc_table$name[lines_sel],
+        #                                  kind = loc_table$kind[lines_sel],
+        #                                  # format = names_format(),
+        #                                  format =TRUE,
+        #                                  link = names_link(),
+        #                                  type = "par"
+        # ))
+        insert_stics_name(name = loc_table$name[lines_sel],
+                          kind = loc_table$kind[lines_sel],
+                          # format = names_format(),
+                          format =TRUE,
+                          link = names_link(),
+                          type = "par"
+        )
       }
-
       if (names_type() == "var") {
         # print(names_table()$variable[1])
-        shiny::stopApp(insert_stics_name(name = loc_table$name[lines_sel],
-                                         # format = names_format(),
-                                         format =TRUE,
-                                         link = names_link(),
-                                         type = "var"
-        ))
+        # shiny::stopApp(insert_stics_name(name = loc_table$name[lines_sel],
+        #                                  # format = names_format(),
+        #                                  format =TRUE,
+        #                                  link = names_link(),
+        #                                  type = "var"
+        # ))
+        insert_stics_name(name = loc_table$name[lines_sel],
+                          # format = names_format(),
+                          format =TRUE,
+                          link = names_link(),
+                          type = "var"
+        )
       }
 
     })
 
-
-      # Handle the cancel button click for quitting the app
-      shiny::observeEvent(input$cancel, {
-        shiny::stopApp()
-      })
+    # Handle the cancel button click for quitting the app
+    shiny::observeEvent(input$cancel, {
+      shiny::stopApp()
+    })
 
   }
 
+
   shiny::runGadget(ui, server, viewer = shiny::dialogViewer("Find and insert Stics names"))#,width = 700, height = 2000))
+
+  # For keeping gadget and multiple insertions
+  #shiny::runGadget(ui, server, viewer = paneViewer())
 
 }
 
