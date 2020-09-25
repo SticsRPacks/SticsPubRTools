@@ -3,7 +3,7 @@ Title: Help functionalities for formatting Rmarkdown documents
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Patrice",
-           family = "Leharpentier",
+           family = "Lecharpentier",
            role = c("aut", "cre"),
            email = "patrice.lecharpentier@inrae.fr")
 Description: Provides functions for simplifying Rmarkdown formatting, document generation, illustrations generation including a graphical charter/theme ...

@@ -4,7 +4,7 @@
 \alias{find_stics_names}
 \title{Shiny gadget for finding Stics names}
 \usage{
-find_stics_names()
+find_stics_names(viewer = "pane")
 }
 \description{
 Mini user interface for searching Stics
@@ -14,4 +14,13 @@ inserting in Rmarkdown documents.
 \details{
 Possible selection of different Stics versions, formatting type,
 and search based on partial names.
+}
+\examples{
+\dontrun{
+
+find_stics_names()
+
+find_stics_names( viewer = "dialog" )
+
+}
 }

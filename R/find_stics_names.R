@@ -9,10 +9,19 @@
 #'
 #' @export
 #'
-# @examples
+#' @examples
+#' \dontrun{
+#'
+#' find_stics_names()
+#'
+#' find_stics_names( viewer = "dialog" )
+#'
+#' }
 
-find_stics_names <- function() {
+find_stics_names <- function(viewer = "pane") {
   library(SticsRFiles)
+
+  viewers <- c("pane", "dialog")
 
   # Masquing warnings display during app execution
   options(warn=-1)
@@ -272,23 +281,23 @@ find_stics_names <- function() {
     # # Handle filtering names using case sensitive search or not
     # # with string in name
     shiny::observeEvent(input$case_sensitive, {
-        # output$table <- shiny::renderTable({
-        #   names_table()
-        # }, caption = "Results",
-        # caption.placement = getOption("xtable.caption.placement", "top"),
-        # caption.width = getOption("xtable.caption.width", NULL)
-        # )
+      # output$table <- shiny::renderTable({
+      #   names_table()
+      # }, caption = "Results",
+      # caption.placement = getOption("xtable.caption.placement", "top"),
+      # caption.width = getOption("xtable.caption.width", NULL)
+      # )
 
-        dt_names <- names_table()[,1:3]
+      dt_names <- names_table()[,1:3]
 
-        output$table <- DT::renderDataTable(DT::datatable(dt_names,
-                                                          options = list(searching = FALSE),
-                                                          caption = "Click on a line to select or unselect it"),
-                                            server = TRUE)
+      output$table <- DT::renderDataTable(DT::datatable(dt_names,
+                                                        options = list(searching = FALSE),
+                                                        caption = "Click on a line to select or unselect it"),
+                                          server = TRUE)
 
-        output$number <- shiny::renderText(paste0(as.character(rows_num()),
-                                                  " ", input$type,
-                                                  '(s) found'))
+      output$number <- shiny::renderText(paste0(as.character(rows_num()),
+                                                " ", input$type,
+                                                '(s) found'))
 
     })
 
@@ -362,11 +371,14 @@ find_stics_names <- function() {
 
   }
 
+  if ( viewer == "dialog") {
+    shiny::runGadget(ui, server, viewer = shiny::dialogViewer(dialogName = "Find and insert Stics names"))#,width = 700, height = 2000))
+  }
 
-  shiny::runGadget(ui, server, viewer = shiny::dialogViewer("Find and insert Stics names"))#,width = 700, height = 2000))
-
-  # For keeping gadget and multiple insertions
-  #shiny::runGadget(ui, server, viewer = paneViewer())
+  if ( viewer == "pane" ) {
+    # For keeping gadget and multiple insertions
+    shiny::runGadget(ui, server, viewer = paneViewer(minHeight = "maximize"))
+  }
 
 }
 
