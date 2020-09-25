@@ -250,7 +250,7 @@ read_zotero_references <- function(library_name,
                               collection_name = collection_name,
                               limit = number)
 
-  invisible(capture.output(
+  invisible(utils::capture.output(
     r <- RefManageR::ReadZotero(group = group_id, .params = params)
   ))
 

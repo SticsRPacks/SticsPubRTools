@@ -381,7 +381,7 @@ find_stics_names <- function(viewer = "pane") {
 
   if ( viewer == "pane" ) {
     # For keeping gadget and multiple insertions
-    shiny::runGadget(ui, server, viewer = paneViewer(minHeight = "maximize"))
+    shiny::runGadget(ui, server, viewer = shiny::paneViewer(minHeight = "maximize"))
   }
 
 }
