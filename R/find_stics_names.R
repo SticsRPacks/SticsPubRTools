@@ -3,8 +3,12 @@
 #' parameters or variable names and formatting them for
 #' inserting in Rmarkdown documents.
 #'
-#' @details Possible selection of different Stics versions, formatting type,
-#' and search based on partial names.
+#' @param viewer viewer name to choose between "pane" (default) or "dialog"
+#'
+#' @details Possible selection of names type (parameter or variable),
+#' Stics versions, formatting type.
+#' And the names search is based on partial matching using case sensitive or not,
+#' name starting matching or not.
 #'
 #'
 #' @export

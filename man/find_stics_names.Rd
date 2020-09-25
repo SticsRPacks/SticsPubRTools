@@ -6,14 +6,19 @@
 \usage{
 find_stics_names(viewer = "pane")
 }
+\arguments{
+\item{viewer}{viewer name to choose between "pane" (default) or "dialog"}
+}
 \description{
 Mini user interface for searching Stics
 parameters or variable names and formatting them for
 inserting in Rmarkdown documents.
 }
 \details{
-Possible selection of different Stics versions, formatting type,
-and search based on partial names.
+Possible selection of names type (parameter or variable),
+Stics versions, formatting type.
+And the names search is based on partial matching using case sensitive or not,
+name starting matching or not.
 }
 \examples{
 \dontrun{
