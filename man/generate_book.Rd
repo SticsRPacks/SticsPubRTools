@@ -8,7 +8,7 @@ generate_book(
   input_rmd = NULL,
   book_pkg_dir = getwd(),
   output_format = NULL,
-  params = NULL
+  params = list()
 )
 }
 \arguments{
@@ -20,7 +20,8 @@ generate_book(
 (optional, default: "bookdown::html_document2")}
 
 \item{params}{A list containing parameters to pass to the Rmd
-document to partameterize the output}
+document to partameterize the output or overload existing params in the
+document}
 }
 \value{
 A success status of the document generation
