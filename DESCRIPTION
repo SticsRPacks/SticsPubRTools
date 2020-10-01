@@ -30,4 +30,5 @@ Imports:
     DT,
     rstudioapi,
     ggthemes,
-    patchwork
+    patchwork,
+    rmarkdown
