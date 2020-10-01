@@ -29,4 +29,5 @@ Imports:
     tibble,
     DT,
     rstudioapi,
-    ggthemes
+    ggthemes,
+    patchwork
