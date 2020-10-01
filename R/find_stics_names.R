@@ -70,7 +70,7 @@ find_stics_names <- function(viewer = "pane") {
                            shiny::fillRow(height = "30%",
                                           shiny::fillCol(width = "70%",
                                                          shiny::selectInput(inputId = "type", label = shiny::strong("Type of name"),
-                                                                            choices = c("variable", "parameter"),selected = "parameter")
+                                                                            choices = c("variable", "parameter", "internal variable"),selected = "parameter")
                                           ),
                                           shiny::fillCol(width = "70%",
                                                          shiny::selectInput(inputId = "version", label = shiny::strong("Stics version"),
@@ -160,6 +160,9 @@ find_stics_names <- function(viewer = "pane") {
       #l <- get_names_list(type = names_type(), stics_version = names_version())[[names_version()]]
       l <- get_names_list(type = names_type(), stics_version = names_version())
 
+      # An empty data.frame
+      if (!nrow(l)) return(l)
+
       if (length(in_name())) {
 
         if (case_sensitive()) {
@@ -173,6 +176,9 @@ find_stics_names <- function(viewer = "pane") {
         id <- grepl(pattern = pattern, x = names_list)
         return(l[id,])
       }
+
+      if (nrow(l)) l <- l[,1:3]
+
       return(l)
     })
 
@@ -202,9 +208,8 @@ find_stics_names <- function(viewer = "pane") {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      dt_names <- names_table()[,1:3]
 
-      output$table <- DT::renderDataTable(DT::datatable(dt_names,
+      output$table <- DT::renderDataTable(DT::datatable(names_table(),
                                                         options = list(searching = FALSE),
                                                         caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
@@ -223,9 +228,8 @@ find_stics_names <- function(viewer = "pane") {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      dt_names <- names_table()[,1:3]
 
-      output$table <- DT::renderDataTable(DT::datatable(dt_names,
+      output$table <- DT::renderDataTable(DT::datatable(names_table(),
                                                         options = list(searching = FALSE),
                                                         caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
@@ -246,9 +250,7 @@ find_stics_names <- function(viewer = "pane") {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      dt_names <- names_table()[,1:3]
-
-      output$table <- DT::renderDataTable(DT::datatable(dt_names,
+      output$table <- DT::renderDataTable(DT::datatable(names_table(),
                                                         options = list(searching = FALSE),
                                                         caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
@@ -269,9 +271,7 @@ find_stics_names <- function(viewer = "pane") {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      dt_names <- names_table()[,1:3]
-
-      output$table <- DT::renderDataTable(DT::datatable(dt_names,
+      output$table <- DT::renderDataTable(DT::datatable(names_table(),
                                                         options = list(searching = FALSE),
                                                         caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
@@ -292,7 +292,7 @@ find_stics_names <- function(viewer = "pane") {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      dt_names <- names_table()[,1:3]
+      dt_names <- names_table()
 
       output$table <- DT::renderDataTable(DT::datatable(dt_names,
                                                         options = list(searching = FALSE),
@@ -365,7 +365,21 @@ find_stics_names <- function(viewer = "pane") {
                           type = "var"
         )
       }
-
+      if (names_type() == "int") {
+        # print(names_table()$variable[1])
+        # shiny::stopApp(insert_stics_name(name = loc_table$name[lines_sel],
+        #                                  # format = names_format(),
+        #                                  format =TRUE,
+        #                                  link = names_link(),
+        #                                  type = "var"
+        # ))
+        insert_stics_name(name = loc_table$name[lines_sel],
+                          # format = names_format(),
+                          format =TRUE,
+                          link = names_link(),
+                          type = "int"
+        )
+      }
     })
 
     # Handle the cancel button click for quitting the app

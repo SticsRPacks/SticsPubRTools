@@ -33,15 +33,16 @@ insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE, l
 # @export
 get_names_list <- function(type = "par", stics_version = "last") {
 
-  type_list <- c("par", 'var')
+  type_list <- c("par", "var", "int")
 
   if ( ! type %in% type_list ) stop()
 
   stics_version <- SticsRFiles:::check_version_compat(version_name = stics_version)
 
-  names_var <- paste0(type, "_names")
+
 
   # ----------------- commented: starting section using stics environment function ------------------#
+  # names_var <- paste0(type, "_names")
   # # Creating stics_names env in stics env
   # if ( ! SticsRFiles::sticsexists(name = "stics_names") ) SticsRFiles::sticsenv(name = "stics_names")
   #
@@ -63,6 +64,10 @@ get_names_list <- function(type = "par", stics_version = "last") {
   if ( type == "var" ) {
     # For outputs.csv
     names <- SticsRFiles::get_var_info(version = stics_version)
+  }
+
+  if (type == "int") {
+    names <- all_int_var(version = stics_version)
   }
 
   # temporarily early return, without using of environment.
@@ -92,7 +97,7 @@ get_names_list <- function(type = "par", stics_version = "last") {
 
 format_name <- function(name, type = "par", kind = NULL, inline = FALSE ) {
 
-  types <- c("var", "par")
+  types <- c("var", "par", "int")
   in_sign <- "$"
   if ( !inline ) in_sign <- ""
 
@@ -100,6 +105,10 @@ format_name <- function(name, type = "par", kind = NULL, inline = FALSE ) {
 
   if ( type == "var" && base::is.null(kind) ) {
     return(paste0(in_sign, make_pattern(name), in_sign))
+  }
+
+  if ( type == "int" && base::is.null(kind) ) {
+    return(paste0(in_sign, "\\mathsc{",make_pattern(name),"}", in_sign))
   }
 
   # Identity
@@ -209,4 +218,25 @@ make_pattern <- function(name, symbol = c("_", "."), where = NULL) {
   #return(name)
 }
 
+
+
+all_int_var <- function(version = "last"){
+
+  # Checking and getting the right version
+  version <- SticsRFiles:::check_version_compat( version_name = version)
+
+  file_path <- file.path(SticsRFiles:::get_examples_path( file_type = "csv", version_name = version ), "internal_variables_v10.csv")
+
+  if (!file.exists(file_path)) return(invisible(data.frame()))
+
+  var_df <- utils::read.csv2(file_path,
+    header = TRUE,
+    stringsAsFactors = FALSE)[,1:4]
+
+  names(var_df) <- c("name", "definition", "unit", "internal")
+
+  # Adding a version  attribute
+  attr(x = var_df, which = "version") <- version
+  return(var_df)
+}
 

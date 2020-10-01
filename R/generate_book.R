@@ -5,7 +5,7 @@
 #' @param output_format String defining the type of document to build
 #' (optional, default: "bookdown::html_document2")
 #' @param params A list containing parameters to pass to the Rmd
-#' document to partameterize the output or overload existing params in the
+#' document to parameterize the output or overload existing params in the
 #' document
 #'
 #' @description The generation of an entire book is performed without
