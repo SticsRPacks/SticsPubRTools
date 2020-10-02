@@ -108,7 +108,7 @@ format_name <- function(name, type = "par", kind = NULL, inline = FALSE ) {
   }
 
   if ( type == "int" && base::is.null(kind) ) {
-    return(paste0(in_sign, "\\mathsc{",make_pattern(name),"}", in_sign))
+    return(paste0(in_sign, "\\mathsf{",make_pattern(name),"}", in_sign))
   }
 
   # Identity
