@@ -234,7 +234,8 @@ all_int_var <- function(version = "last"){
   # file_path <- file.path(SticsRFiles:::get_examples_path( file_type = "csv", version_name = version ), "internal_variables_v10.csv")
 
   # ALTERNATIVE: USING THE BOOK PROJECT FILE
-  file_path <- file.path(rstudioapi::getActiveProject(),"data","internal_variables_v10.csv")
+  #file_path <- file.path(rstudioapi::getActiveProject(),"data","internal_variables_v10.csv")
+  file_path <- file.path(getwd(),"data","internal_variables_v10.csv")
 
   if (!file.exists(file_path)) return(invisible(data.frame()))
 
