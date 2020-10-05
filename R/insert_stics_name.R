@@ -3,7 +3,7 @@
 # Call this function as an addin to insert \code{ Stics names } at the cursor position.
 #
 # @export
-insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE, link = FALSE) {
+insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE, link = FALSE, latex = FALSE) {
 
   if ( !format && !link ) {
     rstudioapi::insertText(name)
@@ -11,7 +11,7 @@ insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE, l
   }
   # Formating name before insertion
   if ( !link ) {
-    fname <- format_name(name = name, type = type, kind = kind)
+    fname <- format_name(name = name, type = type, kind = kind, latex = latex)
     # print("formatting name")
     # print(type)
     # print(kind)
@@ -20,7 +20,7 @@ insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE, l
     return(invisible())
   }
 
-  fname <- format_names_link(names = name, kinds = kind , type = type, inline = link)
+  fname <- format_names_link(names = name, kinds = kind , type = type, inline = link, latex = latex)
   # check fname content
   rstudioapi::insertText(fname)
 }
@@ -95,10 +95,13 @@ get_names_list <- function(type = "par", stics_version = "last") {
 
 
 
-format_name <- function(name, type = "par", kind = NULL, inline = FALSE ) {
+format_name <- function(name, type = "par", kind = NULL, inline = FALSE, latex = FALSE ) {
 
   types <- c("var", "par", "int")
   in_sign <- "$"
+  escape <- ""
+  if (latex) escape <- "\\"
+
   if ( !inline ) in_sign <- ""
 
   if ( ! type %in% types ) return()
@@ -108,7 +111,7 @@ format_name <- function(name, type = "par", kind = NULL, inline = FALSE ) {
   }
 
   if ( type == "int" && base::is.null(kind) ) {
-    return(paste0(in_sign, "\\mathsf{",make_pattern(name),"}", in_sign))
+    return(paste0(in_sign, escape, "\\mathsf{",make_pattern(name),"}", in_sign))
   }
 
   # Identity
@@ -119,19 +122,19 @@ format_name <- function(name, type = "par", kind = NULL, inline = FALSE ) {
   #name <- gsub(pattern = "\\_", replacement = "\\\\_", name)
   name <- make_pattern(name)
 
-  name_str <- paste0(in_sign, "\\mathbf{", name,"}","_{",ind,"}", in_sign)
+  name_str <- paste0(in_sign, escape,"\\mathbf{", name,"}","_{",ind,"}", in_sign)
 
   return(name_str)
 
 }
 
-format_names <- function(names, kinds = NULL, type = "par", inline = FALSE) {
+format_names <- function(names, kinds = NULL, type = "par", inline = FALSE, latex = FALSE) {
 
   # checking dimensions
   names_nb <- length(names)
 
   if ( base::is.null(kinds) ) {
-    return(unlist(lapply(names, function(x) format_name(x, type = type, inline = inline))))
+    return(unlist(lapply(names, function(x) format_name(x, type = type, inline = inline, latex = latex))))
   }
 
   if( names_nb != length(kinds) ) {
@@ -140,16 +143,19 @@ format_names <- function(names, kinds = NULL, type = "par", inline = FALSE) {
 
   out_names <- vector(mode = "character", names_nb)
   for ( i in 1:names_nb ) {
-    out_names[i] <- format_name(name = names[i], kind = kinds[i], inline = inline)
+    out_names[i] <- format_name(name = names[i], kind = kinds[i], inline = inline, latex = latex)
   }
 
   return(out_names)
 }
 
 
-format_names_link <- function(names, kinds = NULL , type = "par", target = FALSE, inline = FALSE) {
+format_names_link <- function(names, kinds = NULL , type = "par", target = FALSE, inline = FALSE, latex = FALSE) {
 
-  formatted_names <- format_names(names = names, kinds = kinds, type = type, inline = inline)
+  escape <- ""
+  if (latex) escape <- "\\"
+
+  formatted_names <- format_names(names = names, kinds = kinds, type = type, inline = inline, latex = latex)
 
   names_label <- get_label_from_name(names)
 
@@ -157,16 +163,16 @@ format_names_link <- function(names, kinds = NULL , type = "par", target = FALSE
     fmt <- "[%s]{#%s-%s}"
     names_link <- sprintf(fmt = fmt, formatted_names, type, names_label )
   } else {
-    fmt <- "[%s](#%s-%s) \\index{%s}"
+    fmt <- paste0("[%s](#%s-%s) ", escape,"\\index{%s}")
     names_link <- sprintf(fmt = fmt, formatted_names, type, names_label, names )
   }
 
   return(names_link)
 }
 
-format_names_target <- function(names, kinds = NULL , type = "par", inline = FALSE) {
+format_names_target <- function(names, kinds = NULL , type = "par", inline = FALSE, latex = FALSE) {
 
-  return(format_names_link(names = names, kinds = kinds, type = type, target = TRUE, inline = inline))
+  return(format_names_link(names = names, kinds = kinds, type = type, target = TRUE, inline = inline, latex = latex))
 }
 
 
@@ -222,10 +228,13 @@ make_pattern <- function(name, symbol = c("_", "."), where = NULL) {
 
 all_int_var <- function(version = "last"){
 
+  # DISABLED FOR THE MOMENT
   # Checking and getting the right version
-  version <- SticsRFiles:::check_version_compat( version_name = version)
+  # version <- SticsRFiles:::check_version_compat( version_name = version)
+  # file_path <- file.path(SticsRFiles:::get_examples_path( file_type = "csv", version_name = version ), "internal_variables_v10.csv")
 
-  file_path <- file.path(SticsRFiles:::get_examples_path( file_type = "csv", version_name = version ), "internal_variables_v10.csv")
+  # ALTERNATIVE: USING THE BOOK PROJECT FILE
+  file_path <- file.path(rstudioapi::getActiveProject(),"data","internal_variables_v10.csv")
 
   if (!file.exists(file_path)) return(invisible(data.frame()))
 
