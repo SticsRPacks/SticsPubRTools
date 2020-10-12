@@ -179,6 +179,9 @@ find_stics_names <- function(viewer = "pane") {
 
       if (nrow(l)) l <- l[,1:3]
 
+      cat("writing table file ...")
+      write.csv(l, file="/tmp/test.csv", sep = ";")
+
       return(l)
     })
 
@@ -209,7 +212,7 @@ find_stics_names <- function(viewer = "pane") {
       # )
 
 
-      output$table <- DT::renderDataTable(DT::datatable(names_table(),
+      output$table <- DT::renderDataTable(DT::datatable(get_usefull_cols(names_table(), 1:3),
                                                         options = list(searching = FALSE),
                                                         caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
@@ -229,7 +232,7 @@ find_stics_names <- function(viewer = "pane") {
       # )
 
 
-      output$table <- DT::renderDataTable(DT::datatable(names_table(),
+      output$table <- DT::renderDataTable(DT::datatable(get_usefull_cols(names_table(), 1:3),
                                                         options = list(searching = FALSE),
                                                         caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
@@ -250,7 +253,7 @@ find_stics_names <- function(viewer = "pane") {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      output$table <- DT::renderDataTable(DT::datatable(names_table(),
+      output$table <- DT::renderDataTable(DT::datatable(get_usefull_cols(names_table(), 1:3),
                                                         options = list(searching = FALSE),
                                                         caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
@@ -271,7 +274,7 @@ find_stics_names <- function(viewer = "pane") {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      output$table <- DT::renderDataTable(DT::datatable(names_table(),
+      output$table <- DT::renderDataTable(DT::datatable(get_usefull_cols(names_table(), 1:3),
                                                         options = list(searching = FALSE),
                                                         caption = "Click on a line to select or unselect it"),
                                           server = TRUE)
@@ -292,9 +295,8 @@ find_stics_names <- function(viewer = "pane") {
       # caption.width = getOption("xtable.caption.width", NULL)
       # )
 
-      dt_names <- names_table()
 
-      output$table <- DT::renderDataTable(DT::datatable(dt_names,
+      output$table <- DT::renderDataTable(DT::datatable(get_usefull_cols(names_table(), 1:3),
                                                         options = list(searching = FALSE),
                                                         caption = "Click on a line to select or unselect it"),
                                           server = TRUE)

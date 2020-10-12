@@ -94,6 +94,16 @@ get_names_list <- function(type = "par", stics_version = "last") {
 }
 
 
+get_usefull_cols <- function(df, ids) {
+
+  if (!all(dim(df))) return(df)
+
+  real_ids <- intersect(1:ncol(df), ids)
+
+  if (!length(real_ids)) return(data.frame())
+
+  return(subset(df,select = real_ids))
+}
 
 format_name <- function(name, type = "par", kind = NULL, inline = FALSE, latex = FALSE ) {
 
