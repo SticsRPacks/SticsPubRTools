@@ -2,3 +2,8 @@ Name: Find and insert Stics names
 Description: Searching names based on partial match, insert formatted name for RMarkdown.
 Binding: find_stics_names
 Interactive: true
+
+Name: Build current book part
+Description: Buidling a bookdown part open in editor ...
+Binding: build_current_book_part
+Interactive: false

@@ -87,3 +87,42 @@ get_output_dir <- function(dir = getwd()) {
 
   gsub(pattern = "output_dir: (.*)", x = l[idx], replacement = "\\1")
 }
+
+
+
+build_book_part <- function( file_name = NULL, other_names = c("index", "Appendices")){
+
+  # For a single file name
+  if (is.null(file_name)) {
+    in_doc <- get_active_doc()
+  } else {
+    in_doc <- file_name
+  }
+
+  if(length(file_name) > 1) stop("Only one file name is required")
+
+  if (!grepl(pattern = "\\.Rmd$", x = in_doc)) stop("Not a Rmd file")
+
+  if( !file.exists(in_doc)) stop("File does not exist!")
+
+  # check if this is a bookdown part
+  book_dir <- dirname(in_doc)
+  print(book_dir)
+  if(!file.exists(file.path(book_dir, "index.Rmd"))) stop("Not a bookdown part")
+
+  # Getting appendices and references parts
+  other_files <- unlist(lapply(other_names , function(x) grep(pattern = x, x = list.files(book_dir, pattern = "\\.Rmd$"), value = TRUE)))
+
+
+  # Adding extra parts
+  if(length(other_files)) in_doc <- c(in_doc, other_files)
+
+
+  generate_book(input_rmd = unique(in_doc))
+
+}
+
+
+build_current_book_part <- function() {
+  build_book_part()
+}
