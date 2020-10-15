@@ -2,8 +2,9 @@
 #'
 #' @param input_rmd Chapter Rmd file name (optional)
 #' @param book_pkg_dir Book package directory path (optional, default: current directory)
-#' @param output_format String defining the type of document to build
-#' (optional, default: "bookdown::html_document2")
+#' @param output_format String defining the type of document to build (optional);
+#' among "bookdown::pdf_document2", "bookdown::pdf_document2",
+#' "bookdown::gitbook" (default)
 #' @param params A list containing parameters to pass to the Rmd
 #' document to parameterize the output or overload existing params in the
 #' document
@@ -15,6 +16,8 @@
 #'
 #' @return A success status of the document generation
 #' @export
+#'
+#' @seealso \code{\link{build_current_book_part}}
 #'
 #' @examples
 #' \dontrun{
@@ -123,6 +126,26 @@ build_book_part <- function( file_name = NULL, other_names = c("index", "Appendi
 }
 
 
+#' Generating a 'bookdown::gitbook' document from the current
+#' edited bookdown chapter (Rmd)
+#'
+#' @description Generating an output document from the open Rmd file
+#' in the RStudio editor without specifying neither the file name nor
+#' the output format ('bookdown::gitbook')
+#'
+#' @seealso \code{\link{generate_book}} for specifying Rmd files list, and output
+#' format
+#'
+# @return
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' build_current_book_part()
+#'
+#' }
+#'
 build_current_book_part <- function() {
   build_book_part()
 }

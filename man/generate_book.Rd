@@ -16,8 +16,9 @@ generate_book(
 
 \item{book_pkg_dir}{Book package directory path (optional, default: current directory)}
 
-\item{output_format}{String defining the type of document to build
-(optional, default: "bookdown::html_document2")}
+\item{output_format}{String defining the type of document to build (optional);
+among "bookdown::pdf_document2", "bookdown::pdf_document2",
+"bookdown::gitbook" (default)}
 
 \item{params}{A list containing parameters to pass to the Rmd
 document to parameterize the output or overload existing params in the
@@ -44,4 +45,7 @@ generate_book(input_rmd = "07-chap.Rmd", output_format = 'bookdown::pdf_document
 
 
 
+}
+\seealso{
+\code{\link{build_current_book_part}}
 }
