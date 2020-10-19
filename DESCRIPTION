@@ -1,6 +1,7 @@
 Package: SticsPubRTools
 Title: Help functionalities for formatting Rmarkdown documents 
-Version: 0.0.0.9000
+Version: 0.1.0.9000
+Date: 2019-10-19
 Authors@R: 
     person(given = "Patrice",
            family = "Lecharpentier",
