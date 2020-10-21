@@ -47,12 +47,13 @@ generate_book <- function(input_rmd = NULL,
   # Overloading default format
   if (! base::is.null(output_format)) doc_format <- output_format
 
+  # Adding index.Rmd in any case
+  if (! "index.Rmd" %in% input_rmd) input_rmd <- c("index.Rmd", input_rmd)
+
   # For specific parts Rmd files building
   if (! base::is.null(input_rmd)) {
     book_name <- paste("Chapter(s)", input_rmd)
     full_book<- FALSE
-  } else {
-    input_rmd <- "index.Rmd"
   }
 
   # Checking if files exist
