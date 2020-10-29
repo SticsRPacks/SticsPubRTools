@@ -179,8 +179,8 @@ find_stics_names <- function(viewer = "pane") {
 
       if (nrow(l)) l <- l[,1:3]
 
-      cat("writing table file ...")
-      write.csv(l, file="/tmp/test.csv", sep = ";")
+      #cat("writing table file ...")
+      #write.csv(l, file="/tmp/test.csv", sep = ";")
 
       return(l)
     })

@@ -94,7 +94,9 @@ get_output_dir <- function(dir = getwd()) {
 
 
 
-build_book_part <- function( file_name = NULL, other_names = c("index", "Appendices")){
+build_book_part <- function( file_name = NULL,
+                             other_names = c("index", "Appendices"),
+                             output_format = NULL){
 
   # For a single file name
   if (is.null(file_name)) {
@@ -122,7 +124,7 @@ build_book_part <- function( file_name = NULL, other_names = c("index", "Appendi
   if(length(other_files)) in_doc <- c(in_doc, other_files)
 
 
-  generate_book(input_rmd = unique(in_doc))
+  generate_book(input_rmd = unique(in_doc), output_format = output_format)
 
 }
 
