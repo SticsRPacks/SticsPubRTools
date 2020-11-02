@@ -16,8 +16,9 @@ get_label_from_name <- function(name = NULL, sep = "-", no_number_first = TRUE) 
   label <- gsub(pattern = "[\\.]{1,}",replacement = sep, x= label)
 
   # Removing trailing and heading "-"
-  label <- trimws(x = label, whitespace = sep)
-
+  #label <- trimws(x = label, whitespace = sep)
+  patt <- sprintf(fmt = "^[%s]+|[%s]+$", sep,sep)
+  label <- gsub(pattern = patt, replacement = "", x = label)
 
 
 
