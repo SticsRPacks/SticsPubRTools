@@ -164,10 +164,45 @@ update_stics_bibtex_files <- function(file_dir = getwd(),
   ))
 }
 
+
+gen_stics_json_files <- function(file_dir = getwd(),
+                                 library_name = "livre_rouge",
+                                 collection_name = c("sticsredbook2020", "EPS_stics")) {
+
+  # test dir existence
+  if (!dir.exists(file_dir)) stop("Directory does not exist: ",file_dir)
+
+  # Getting group id
+  group_id <- SticsPubRTools:::get_group_id(library_name)
+  if (base::is.null(group_id)) stop("Unknown library name",library_name)
+
+  # Getting API_KEY for querying the wb Zotero rest API
+  collections_id <- SticsPubRTools:::get_collection_id(collection_name)
+  # Getting names from existing ones
+  collection_name <- names(collections_id)
+
+  # Getting API key
+  api_key <- SticsPubRTools:::get_access_key()
+  curl_api_key_string <- paste0("\"Zotero-API-Key: ", api_key, "\"")
+
+  # items URL
+  files_list <- file.path(file_dir, paste0(collection_name, ".json") )
+  collections_url <- paste0("https://api.zotero.org/groups/",group_id, "/collections/",
+                            collections_id, "/items", " > ", files_list)
+
+  # Setting curl query commands
+  curl_commands <- paste("curl -H", curl_api_key_string, collections_url)
+
+
+  return(unlist(lapply(curl_commands, system)))
+
+}
+
 #TODO: see if specific functions may be added
 # i.e. : gen_livre_rouge_bibtex_file, gen_stics_bibtex_file !
 
-
+# Get BibEntry for all references of a library,
+# and optionally for a seficic collection of the library.
 get_references <- function(library_name,
                            collection_name = NULL,
                            query = "",
@@ -230,8 +265,13 @@ get_references <- function(library_name,
 
 
 
-# @param start A numeric indicating from which record number in the base to start the query
 
+# Get BibEntry for a single query
+# for getting a maximum number of 100 references (default)
+# or a specific number and/or range in references ids from a library
+# and optionally for a specific collection of the library.
+
+# @param start A numeric indicating from which record number in the base to start the query
 read_zotero_references <- function(library_name,
                                    collection_name = NULL,
                                    query = "",
@@ -261,7 +301,7 @@ read_zotero_references <- function(library_name,
   return(invisible(r))
 }
 
-
+# Defining query parameters
 get_query_params <- function( key = NULL,
                               query="",
                               query_type = "basic",
@@ -295,6 +335,11 @@ get_query_params <- function( key = NULL,
 }
 
 
+
+
+
+
+
 get_group_id <- function(group_name = NULL) {
 
   groups <- get_groups()
@@ -314,13 +359,31 @@ get_groups <- function() {
 }
 
 
+get_collection_names <- function() {
+  return(names(get_collections()))
+}
+
+
 get_collection_id <- function(collection_name = NULL) {
 
   collections <- get_collections()
+  coll_names <- names(collections)
 
-  if (!collection_name %in% names(collections)) return()
+  if (is.null(collection_name)) collection_name <- coll_names
 
-  return(collections[[collection_name]])
+  exist_in_collections <- collection_name %in% coll_names
+
+  if (!any(exist_in_collections)) return()
+
+  if(!all(exist_in_collections)) warning("At least one collection does not exist: ",
+                                         paste(collection_name[!exist_in_collections], collapse = " "))
+
+  collection_name <- collection_name[exist_in_collections]
+
+  collection_id <- unlist(lapply(collection_name, function(x) collections[[x]]))
+  names(collection_id) <- collection_name
+
+  return(collection_id)
 
 }
 
