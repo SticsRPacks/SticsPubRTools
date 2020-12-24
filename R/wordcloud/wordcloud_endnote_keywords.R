@@ -11,34 +11,32 @@ library("wordcloud")
 library("RColorBrewer")
 library("DBI")
 library("RSQLite")
-library("dplyr")
 
 old_mar <- par("mar")
 
-bib_EPS <- SticsPubRTools:::get_references(library_name = "livre_rouge",
-                                                   collection_name = "EPS_stics")
+# Lire le fichier texte
+# filePath <- "http://www.sthda.com/sthda/RDoc/example-files/martin-luther-king-i-have-a-dream-speech.txt"
+# text <- readLines(filePath)
 
-# Generating a data.frame
-refs <- data.frame(title=unlist(lapply(bib_EPS, function(x) x$title)),
-                         year=as.numeric(unlist(lapply(bib_EPS, function(x) x$year))),
-                   stringsAsFactors = FALSE) %>%
-  arrange(year)
+# import ref enl
+enl <- "/home/plecharpent/Bureau/biblio_stics_fin2020.enl"
+con <- dbConnect(RSQLite::SQLite(), enl)
+table_names <- dbListTables(con)
+contents <- lapply(setNames(nm = table_names), dbReadTable, con = con)
 
+refs <- contents$enl_refs %>% mutate(n_year=as.numeric(year)) %>%
+  arrange(n_year)
 
 filter <- FALSE
-from <- min(refs$year) - 1
-to <- max(refs$year) + 1
-if (filter) refs %>% filter(year > from & year < to ) -> refs
+from <- min(refs$n_year) - 1
+to <- max(refs$n_year) + 1
+if (filter) refs %>% filter(n_year > from & n_year < to ) -> refs
 
 # add filter on years
 # TODO
 
-text <- unlist(lapply(refs[["title"]],
-                      function(x) strsplit(x = x, split = " ")))
-
-# Getting words from titles
-
-
+text <- unlist(lapply(refs[,"keywords"],
+                      function(x) strsplit(x = x, split = "\r")))
 
 # Charger les données comme un corpus
 docs <- Corpus(VectorSource(text))
@@ -55,11 +53,7 @@ docs <- tm_map(docs, removeNumbers)
 # Supprimer les mots vides anglais
 docs <- tm_map(docs, removeWords, stopwords("english"))
 # Supprimer votre propre liste de mots non désirés
-# TODO: faire une liste de mots à supprimer
-to_remove_fr <- c("sur", "des", "stics", "les", "dans" )
-to_remove_eng <- c("across", "due", "model", "new" )
-to_remove <- c(to_remove_fr, to_remove_eng )
-docs <- tm_map(docs, removeWords, to_remove)
+docs <- tm_map(docs, removeWords, c("model", "stics"))
 # Supprimer les ponctuations
 docs <- tm_map(docs, removePunctuation)
 # Supprimer les espaces vides supplémentaires
@@ -81,7 +75,7 @@ par(mar = rep(0, 4))
 
 set.seed(1234)
 wordcloud(words = d$word, freq = d$freq, min.freq = 1,
-          max.words=200, random.order=FALSE, rot.per=0.35,
-          colors=brewer.pal(8, "Dark2"), )
+          max.words=150, random.order=FALSE, rot.per=0.35,
+          colors=brewer.pal(8, "Dark2"))
 
 par(mar=old_mar)
