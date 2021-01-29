@@ -28,6 +28,7 @@ find_stics_names <- function(viewer = "pane") {
   viewers <- c("pane", "dialog")
 
   # Masquing warnings display during app execution
+  # and restoring all warnings on app exiting
   options(warn=-1)
   on.exit(options(warn=0))
 
@@ -57,6 +58,7 @@ find_stics_names <- function(viewer = "pane") {
   stics_versions <- SticsRFiles::get_stics_versions_compat()$versions_list
   last_version <- SticsRFiles::get_stics_versions_compat()$last_version
 
+  # Taking into account an existing word selection in the IDE
   prev_text_sel <- get_doc_word_selection()
   in_text <- ""
   if (!base::is.null(prev_text_sel)) in_text <- prev_text_sel$text
@@ -69,7 +71,11 @@ find_stics_names <- function(viewer = "pane") {
 
                            shiny::fillRow(height = "30%",
                                           shiny::fillCol(width = "70%",
-                                                         shiny::selectInput(inputId = "type", label = shiny::strong("Type of name"),
+                                                         shiny::selectInput(inputId = "what", label = shiny::strong("What to insert"),
+                                                                            choices = c("name", "unit", "both (unit, name)"),selected = "name")
+                                          ),
+                                          shiny::fillCol(width = "70%",
+                                                         shiny::selectInput(inputId = "type", label = shiny::strong("Type"),
                                                                             choices = c("variable", "parameter", "internal variable"),selected = "parameter")
                                           ),
                                           shiny::fillCol(width = "70%",
@@ -87,9 +93,6 @@ find_stics_names <- function(viewer = "pane") {
                            ),
 
                            shiny::fillRow(height = "20%",
-                                          # shiny::fillCol(
-                                          #   shiny::checkboxInput(inputId = "format", label = "Format name for RMarkdown", value = TRUE)
-                                          # ),
                                           shiny::fillCol(
                                             shiny::checkboxInput(inputId = "starting_with", label = "Name starting with ?", value = FALSE)
                                           ),
@@ -117,14 +120,8 @@ find_stics_names <- function(viewer = "pane") {
                            shiny::actionButton("cancel", "Cancel"),
                            shiny::actionButton("insert", "Insert name", shiny::icon("cog", lib = "glyphicon"))
                          ),
-                         # miniUI::miniContentPanel(
-                         #   # miniUI::gadgetTitleBar("Results"),
-                         #   shiny::tableOutput(outputId = "show")
-                         # ),
 
                          miniUI::miniContentPanel(
-                           # miniUI::gadgetTitleBar("Results"),
-                           #shiny::tableOutput(outputId = "table")
                            DT::dataTableOutput('table')
                          )
 
@@ -132,6 +129,9 @@ find_stics_names <- function(viewer = "pane") {
 
 
   server <- function(input, output, session) {
+
+    # Getting what to be inserted: name, unit, both
+    what_type <- shiny::reactive({substr(input$what, start = 1, stop = 4)})
 
     # Getting type: var or par
     names_type <- shiny::reactive({substr(input$type, start = 1, stop = 3)})
@@ -148,16 +148,12 @@ find_stics_names <- function(viewer = "pane") {
     })
 
 
-    # Case sensitive
+    # Getting case sensitive choice
     case_sensitive <- shiny::reactive({input$case_sensitive})
 
-    # Getting table an filtering it
-    #
+    # Getting table and filtering it
     names_table <- shiny::reactive({
 
-      # commented bcause reverting get_names_list not to use stics environment
-      # for managing stics version data.frames
-      #l <- get_names_list(type = names_type(), stics_version = names_version())[[names_version()]]
       l <- get_names_list(type = names_type(), stics_version = names_version())
 
       # An empty data.frame
@@ -177,40 +173,30 @@ find_stics_names <- function(viewer = "pane") {
         return(l[id,])
       }
 
+      # For displaying only the first three columns
       if (nrow(l)) l <- l[,1:3]
-
-      #cat("writing table file ...")
-      #write.csv(l, file="/tmp/test.csv", sep = ";")
 
       return(l)
     })
 
 
-    # getting name link format activation
+    # Getting name link format activation
     names_link <- shiny::reactive({input$link})
 
-    # getting selected version
+    # Getting selected version
     names_version <- shiny::reactive({input$version})
 
-    # getting the name typed
+    # Getting what is to be inserted
+    in_what <- shiny::reactive({input$what})
+
+    # Getting the input string
     in_name <- shiny::reactive({input$name})
 
-    # getting the name typed
+    # Getting the table rows number
     rows_num <- shiny::reactive({nrow(names_table())})
-
-    # getting the found number of par or var
-    #names_number <- shiny::reactive({nrow(output$table)})
-
 
     # Handle the name typed on table selection
     shiny::observeEvent(input$name, {
-      # output$table <- shiny::renderTable({
-      #   names_table()
-      # }, caption = "Results",
-      # caption.placement = getOption("xtable.caption.placement", "top"),
-      # caption.width = getOption("xtable.caption.width", NULL)
-      # )
-
 
       output$table <- DT::renderDataTable(DT::datatable(get_usefull_cols(names_table(), 1:3),
                                                         options = list(searching = FALSE),
@@ -224,13 +210,6 @@ find_stics_names <- function(viewer = "pane") {
 
     # Handle the type selection in dropdown list on loaded table
     shiny::observeEvent(input$type, {
-      # output$table <- shiny::renderTable({
-      #   names_table()
-      # }, caption = "Results",
-      # caption.placement = getOption("xtable.caption.placement", "top"),
-      # caption.width = getOption("xtable.caption.width", NULL)
-      # )
-
 
       output$table <- DT::renderDataTable(DT::datatable(get_usefull_cols(names_table(), 1:3),
                                                         options = list(searching = FALSE),
@@ -246,13 +225,6 @@ find_stics_names <- function(viewer = "pane") {
     # Handle the version selection on table loaded for a given type
     shiny::observeEvent(input$version, {
 
-      # output$table <- shiny::renderTable({
-      #   names_table()
-      # }, caption = "Results",
-      # caption.placement = getOption("xtable.caption.placement", "top"),
-      # caption.width = getOption("xtable.caption.width", NULL)
-      # )
-
       output$table <- DT::renderDataTable(DT::datatable(get_usefull_cols(names_table(), 1:3),
                                                         options = list(searching = FALSE),
                                                         caption = "Click on a line to select or unselect it"),
@@ -264,15 +236,9 @@ find_stics_names <- function(viewer = "pane") {
 
     })
 
-    # Handle filtering names starting with typed
-    # string in name
+    # Handle filtering names starting with the
+    # string in the input
     shiny::observeEvent(input$starting_with, {
-      # output$table <- shiny::renderTable({
-      #   names_table()
-      # }, caption = "Results",
-      # caption.placement = getOption("xtable.caption.placement", "top"),
-      # caption.width = getOption("xtable.caption.width", NULL)
-      # )
 
       output$table <- DT::renderDataTable(DT::datatable(get_usefull_cols(names_table(), 1:3),
                                                         options = list(searching = FALSE),
@@ -285,16 +251,9 @@ find_stics_names <- function(viewer = "pane") {
     })
 
 
-    # # Handle filtering names using case sensitive search or not
-    # # with string in name
+    # Handle filtering names using case sensitive search or not
+    # with string in name
     shiny::observeEvent(input$case_sensitive, {
-      # output$table <- shiny::renderTable({
-      #   names_table()
-      # }, caption = "Results",
-      # caption.placement = getOption("xtable.caption.placement", "top"),
-      # caption.width = getOption("xtable.caption.width", NULL)
-      # )
-
 
       output$table <- DT::renderDataTable(DT::datatable(get_usefull_cols(names_table(), 1:3),
                                                         options = list(searching = FALSE),
@@ -310,40 +269,28 @@ find_stics_names <- function(viewer = "pane") {
     # Handle the Insert button being pressed.
     shiny::observeEvent(input$insert, {
 
-
       loc_table <- names_table()
-
-      #if (rows_num() > 1 || !rows_num()) return()
 
       lines_sel <- input$table_rows_selected
 
+      # No possible insertion cases
+      # Checking if one table line has been selected
       if(base::is.null(lines_sel)) {
         output$indication <- shiny::renderText("Click in one line to select it before inserting !")
         return()
       }
-
-      #print(lines_sel)
-
+      # Checking if more than one table line has been selected
       if(length(lines_sel) > 1) {
         output$indication <- shiny::renderText("Only one line must be selected before inserting !")
         return()
       }
 
-      #if (length(lines_sel) > 1 || base::is.null(lines_sel)) return()
-
-      # Clearing message if any !
+      # Clearing message if any, in indication area
       output$indication <- shiny::renderText("")
 
-      if (names_type() == "par") {
-        #print(loc_table$name[lines_sel])
-        #print(loc_table$kind[lines_sel])
-        # shiny::stopApp(insert_stics_name(name = loc_table$name[lines_sel],
-        #                                  kind = loc_table$kind[lines_sel],
-        #                                  # format = names_format(),
-        #                                  format =TRUE,
-        #                                  link = names_link(),
-        #                                  type = "par"
-        # ))
+      # Inserting parameter name
+      if (names_type() == "par" && what_type() %in% c("name","both") ) {
+
         insert_stics_name(name = loc_table$name[lines_sel],
                           kind = loc_table$kind[lines_sel],
                           # format = names_format(),
@@ -352,14 +299,10 @@ find_stics_names <- function(viewer = "pane") {
                           type = "par"
         )
       }
-      if (names_type() == "var") {
-        # print(names_table()$variable[1])
-        # shiny::stopApp(insert_stics_name(name = loc_table$name[lines_sel],
-        #                                  # format = names_format(),
-        #                                  format =TRUE,
-        #                                  link = names_link(),
-        #                                  type = "var"
-        # ))
+
+      # Inserting output variable name
+      if (names_type() == "var" && what_type() %in% c("name","both")) {
+
         insert_stics_name(name = loc_table$name[lines_sel],
                           # format = names_format(),
                           format =TRUE,
@@ -367,20 +310,24 @@ find_stics_names <- function(viewer = "pane") {
                           type = "var"
         )
       }
-      if (names_type() == "int") {
-        # print(names_table()$variable[1])
-        # shiny::stopApp(insert_stics_name(name = loc_table$name[lines_sel],
-        #                                  # format = names_format(),
-        #                                  format =TRUE,
-        #                                  link = names_link(),
-        #                                  type = "var"
-        # ))
+
+      # Inserting internal variable name
+      if (names_type() == "int" && what_type() %in% c("name","both")) {
+
         insert_stics_name(name = loc_table$name[lines_sel],
                           # format = names_format(),
                           format =TRUE,
                           link = names_link(),
                           type = "int"
         )
+      }
+
+      # Inserting unit cases
+      if (what_type() == "unit" && names_link() ) {
+        insert_stics_unit(loc_table$unit[lines_sel], braces = FALSE)
+      }
+      if (what_type() == "both" && names_link()) {
+        insert_stics_unit(loc_table$unit[lines_sel])
       }
     })
 
@@ -396,7 +343,7 @@ find_stics_names <- function(viewer = "pane") {
   }
 
   if ( viewer == "pane" ) {
-    # For keeping gadget and multiple insertions
+    # For keeping gadget and so multiple insertions capabilities
     shiny::runGadget(ui, server, viewer = shiny::paneViewer(minHeight = "maximize"))
   }
 
