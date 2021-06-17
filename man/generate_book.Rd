@@ -8,7 +8,8 @@ generate_book(
   input_rmd = NULL,
   book_pkg_dir = getwd(),
   output_format = NULL,
-  params = list()
+  params = list(),
+  output_file = NULL
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ among "bookdown::pdf_document2", "bookdown::pdf_document2",
 \item{params}{A list containing parameters to pass to the Rmd
 document to parameterize the output or overload existing params in the
 document}
+
+\item{output_file}{Output file name to be produced}
 }
 \value{
 A success status of the document generation

@@ -9,6 +9,8 @@
 #' document to parameterize the output or overload existing params in the
 #' document
 #'
+#' @param output_file Output file name to be produced
+#'
 #' @description The generation of an entire book is performed without
 #' any given arguments using the current directory which must be an
 #' package book directory or giving a path to the package. A part of the
@@ -34,7 +36,8 @@
 generate_book <- function(input_rmd = NULL,
                           book_pkg_dir = getwd(),
                           output_format = NULL,
-                          params = list()) {
+                          params = list(),
+                          output_file = NULL) {
 
   book_name <- "book"
   full_book <- TRUE
@@ -53,7 +56,7 @@ generate_book <- function(input_rmd = NULL,
   # For specific parts Rmd files building
   if (! base::is.null(input_rmd)) {
     book_name <- paste("Chapter(s)", input_rmd)
-    full_book<- FALSE
+    full_book <- FALSE
   }
 
   # Checking if files exist
@@ -74,7 +77,7 @@ generate_book <- function(input_rmd = NULL,
                             output_format = doc_format, params = params, envir = new.env())
     } else {
       bookdown::preview_chapter(input = input_rmd,
-                                output_format = doc_format, params = params, envir = new.env())
+                                output_format = doc_format, params = params, envir = new.env(), output_file = output_file)
     })
 
   return(invisible(book_pkg_dir))
@@ -96,13 +99,20 @@ get_output_dir <- function(dir = getwd()) {
 
 build_book_part <- function( file_name = NULL,
                              other_names = c("index", "Appendices"),
-                             output_format = NULL){
+                             output_format = NULL,
+                             output_file = NULL){
 
   # For a single file name
   if (is.null(file_name)) {
     in_doc <- get_active_doc()
   } else {
     in_doc <- file_name
+  }
+
+  # Setting the output file name if only one file
+  # in file_name vector !
+  if (length(in_doc) == 1) {
+    output_file <- gsub(x = basename(in_doc), pattern = "\\.Rmd$", replacement = "")
   }
 
   if(length(file_name) > 1) stop("Only one file name is required")
@@ -124,7 +134,8 @@ build_book_part <- function( file_name = NULL,
   if(length(other_files)) in_doc <- c(in_doc, other_files)
 
 
-  generate_book(input_rmd = unique(in_doc), output_format = output_format)
+  generate_book(input_rmd = unique(in_doc), output_format = output_format,
+                output_file = output_file)
 
 }
 
@@ -145,10 +156,18 @@ build_book_part <- function( file_name = NULL,
 #' @examples
 #' \dontrun{
 #'
-#' build_current_book_part()
+#' build_current_book_part_html()
 #'
 #' }
 #'
-build_current_book_part <- function() {
-  build_book_part()
+# build_current_book_part_gitbook <- function() {
+#   build_book_part(output_format = "bookdown::gitbook")
+# }
+
+build_current_book_part_pdf <- function() {
+  build_book_part(output_format = "bookdown::pdf_document2")
+}
+
+build_current_book_part_html <- function() {
+  build_book_part(output_format = "bookdown::html_document2")
 }
