@@ -182,7 +182,7 @@ gen_stics_json_files <- function(file_dir = getwd(),
   collection_name <- names(collections_id)
 
   # Getting API key
-  api_key <- SticsPubRTools:::get_access_key()
+  api_key <- get_access_key()
   curl_api_key_string <- paste0("\"Zotero-API-Key: ", api_key, "\"")
 
   # items URL
