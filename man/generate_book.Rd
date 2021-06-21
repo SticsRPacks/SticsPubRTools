@@ -42,7 +42,8 @@ generate_book()
 
 generate_book(input_rmd = "07-chap.Rmd")
 
-generate_book(input_rmd = "07-chap.Rmd", output_format = 'bookdown::pdf_document2')
+generate_book(input_rmd = "07-chap.Rmd",
+              output_format = 'bookdown::pdf_document2')
 
 }
 
@@ -50,5 +51,5 @@ generate_book(input_rmd = "07-chap.Rmd", output_format = 'bookdown::pdf_document
 
 }
 \seealso{
-\code{\link{build_current_book_part}}
+\code{\link{build_current_book_part_html}, \link{build_current_book_part_pdf}}
 }

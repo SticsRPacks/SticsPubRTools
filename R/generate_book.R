@@ -19,7 +19,7 @@
 #' @return A success status of the document generation
 #' @export
 #'
-#' @seealso \code{\link{build_current_book_part}}
+#' @seealso \code{\link{build_current_book_part_html}, \link{build_current_book_part_pdf}}
 #'
 #' @examples
 #' \dontrun{
@@ -27,7 +27,8 @@
 #'
 #' generate_book(input_rmd = "07-chap.Rmd")
 #'
-#' generate_book(input_rmd = "07-chap.Rmd", output_format = 'bookdown::pdf_document2')
+#' generate_book(input_rmd = "07-chap.Rmd",
+#'               output_format = 'bookdown::pdf_document2')
 #'
 #' }
 #'
@@ -140,12 +141,12 @@ build_book_part <- function( file_name = NULL,
 }
 
 
-#' Generating a 'bookdown::gitbook' document from the current
+#' Generating a 'bookdown::html_document2' document from the current
 #' edited bookdown chapter (Rmd)
 #'
 #' @description Generating an output document from the open Rmd file
 #' in the RStudio editor without specifying neither the file name nor
-#' the output format ('bookdown::gitbook')
+#' the output format ('bookdown::html_document2')
 #'
 #' @seealso \code{\link{generate_book}} for specifying Rmd files list, and output
 #' format
@@ -160,14 +161,38 @@ build_book_part <- function( file_name = NULL,
 #'
 #' }
 #'
-# build_current_book_part_gitbook <- function() {
-#   build_book_part(output_format = "bookdown::gitbook")
-# }
+
+build_current_book_part_html <- function() {
+  build_book_part(output_format = "bookdown::html_document2")
+}
+
+
+
+#' Generating a 'bookdown::pdf_document2' document from the current
+#' edited bookdown chapter (Rmd)
+#'
+#' @description Generating an output document from the open Rmd file
+#' in the RStudio editor without specifying neither the file name nor
+#' the output format ('bookdown::pdf_document2')
+#'
+#' @seealso \code{\link{generate_book}} for specifying Rmd files list, and output
+#' format
+#'
+# @return
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' build_current_book_part_pdf()
+#'
+#' }
+#'
+#'
 
 build_current_book_part_pdf <- function() {
   build_book_part(output_format = "bookdown::pdf_document2")
 }
 
-build_current_book_part_html <- function() {
-  build_book_part(output_format = "bookdown::html_document2")
-}
+
+
