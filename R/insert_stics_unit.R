@@ -142,10 +142,11 @@ format_code_values <- function(code_values) {
   code_values <- code_values[1:2]
 
   out <- paste0(paste0(as.character(code_values)), collapse = format)
+
   # adding code explicitly, if exists in initial unit
   if (code_found) out <- paste0("code,\\ ", out)
 
-  paste0("$",out,"$")
+  out
 }
 
 format_expo_values <- function(unit) {
