@@ -12,3 +12,8 @@ Name: Build current book part => pdf
 Description: Buidling a bookdown part open in editor ...
 Binding: build_current_book_part_pdf
 Interactive: false
+
+Name: Build current book part => docx
+Description: Buidling a bookdown part open in editor ...
+Binding: build_current_book_part_docx
+Interactive: false

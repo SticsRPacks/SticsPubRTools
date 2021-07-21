@@ -8,7 +8,6 @@
 #' @param params A list containing parameters to pass to the Rmd
 #' document to parameterize the output or overload existing params in the
 #' document
-#'
 #' @param output_file Output file name to be produced
 #'
 #' @description The generation of an entire book is performed without
@@ -52,7 +51,8 @@ generate_book <- function(input_rmd = NULL,
   if (! base::is.null(output_format)) doc_format <- output_format
 
   # Adding index.Rmd in any case
-  if (! "index.Rmd" %in% input_rmd) input_rmd <- c("index.Rmd", input_rmd)
+  if (!("index.Rmd" %in% input_rmd)) input_rmd <- c("index.Rmd", input_rmd)
+
 
   # For specific parts Rmd files building
   if (! base::is.null(input_rmd)) {
@@ -135,7 +135,8 @@ build_book_part <- function( file_name = NULL,
   if(length(other_files)) in_doc <- c(in_doc, other_files)
 
 
-  generate_book(input_rmd = unique(in_doc), output_format = output_format,
+  generate_book(input_rmd = unique(in_doc),
+                output_format = output_format,
                 output_file = output_file)
 
 }
@@ -194,5 +195,28 @@ build_current_book_part_pdf <- function() {
   build_book_part(output_format = "bookdown::pdf_document2")
 }
 
-
+#' Generating a 'bookdown::word_document2' document from the current
+#' edited bookdown chapter (Rmd)
+#'
+#' @description Generating an output document from the open Rmd file
+#' in the RStudio editor without specifying neither the file name nor
+#' the output format ('bookdown::word_document2')
+#'
+#' @seealso \code{\link{generate_book}} for specifying Rmd files list, and output
+#' format
+#'
+# @return
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' build_current_book_part_docx()
+#'
+#' }
+#'
+#'
+build_current_book_part_docx <- function() {
+  build_book_part(output_format = "bookdown::word_document2")
+}
 
