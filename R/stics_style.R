@@ -4,7 +4,7 @@
 #' @param gg_object
 #'
 #' @return a ggplot object
-# @export
+#' @export
 #'
 # @examples
 set_style <- function(gg_object, type = "book", ...) {
@@ -17,12 +17,14 @@ set_style <- function(gg_object, type = "book", ...) {
 #' @param ...For overloading ggplot theme elements as for theme
 #'
 #' @return a ggplot theme
-# @export
+#' @export
 #'
 # @examples
 book_style <- function(type="book",...) {
 
   font ="Times New Roman"
+  font_size <- "11"
+  font_color <- "#222222"
   theme_colors <- c("#FFDB6D", "#C4961A", "#F4EDCA", "#D16103", "#C3D7A4",
                       "#52854C", "#4E84C4", "#293352")
 
@@ -58,7 +60,7 @@ book_style <- function(type="book",...) {
     plot.title = ggplot2::element_text(family=font,
                                        size=28,
                                        face="bold",
-                                       color="#222222"),
+                                       color=font_color),
 
     # Legend format
     # This sets the position and alignment of the legend, removes a title and
@@ -71,8 +73,8 @@ book_style <- function(type="book",...) {
     legend.title = ggplot2::element_blank(),
     legend.key = ggplot2::element_blank(),
     legend.text = ggplot2::element_text(family=font,
-                                        size=18,
-                                        color="#222222"),
+                                        size=font_size,
+                                        color=font_color),
 
     # Axis format
     # This sets the text font, size and colour for the axis test, as well as
@@ -81,8 +83,8 @@ book_style <- function(type="book",...) {
     # - the cookbook shows examples of how to do so.
     axis.title = ggplot2::element_blank(),
     axis.text = ggplot2::element_text(family=font,
-                                      size=18,
-                                      color="#222222"),
+                                      size=font_size,
+                                      color=font_color),
     axis.text.x = ggplot2::element_text(margin=ggplot2::margin(5, b = 10)),
     axis.ticks = ggplot2::element_blank(),
     axis.line = ggplot2::element_blank(),
