@@ -96,8 +96,8 @@ book_style <- function(type="book",...) {
 
   # default colors
   theme_list <- list(theme_list,
-                     scale_color_manual(values = theme_colors),
-                     scale_fill_manual(values = theme_colors))
+                     ggplot::scale_color_manual(values = theme_colors),
+                     ggplot::scale_fill_manual(values = theme_colors))
 
   # Manage modifiers given as ... arguments
   args <- list(...)
@@ -107,8 +107,8 @@ book_style <- function(type="book",...) {
     theme_colors <- args$custom_cols
   }
   theme_list <- list(theme_list,
-                     scale_color_manual(values = theme_colors ),
-                     scale_fill_manual(values = theme_colors))
+                     ggplot::scale_color_manual(values = theme_colors ),
+                     ggplot::scale_fill_manual(values = theme_colors))
 
 
   # remove legend

@@ -33,9 +33,9 @@ insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE, l
 # @export
 get_names_list <- function(type = "par", stics_version = "last") {
 
-  type_list <- c("par", "var", "int")
+  types_list <- c("par", "var", "int", "all")
 
-  if ( ! type %in% type_list ) stop()
+  if ( ! type %in% types_list ) stop()
 
   stics_version <- SticsRFiles:::check_version_compat(version_name = stics_version)
 
@@ -67,9 +67,16 @@ get_names_list <- function(type = "par", stics_version = "last") {
   }
 
   if (type == "int") {
-    names <- all_int_var(version = stics_version)
+    names <- all_int_var(version = stics_version, lib = TRUE)
   }
 
+
+  if (type == "all") {
+    names <- list()
+    names$par <- SticsRFiles:::get_param_desc(version = stics_version)
+    names$var <- SticsRFiles::get_var_info(version = stics_version)
+    names$int <- all_int_var(version = stics_version, lib = TRUE)
+  }
   # temporarily early return, without using of environment.
   return(names)
 
@@ -160,10 +167,13 @@ format_names <- function(names, kinds = NULL, type = "par", inline = FALSE, late
 }
 
 
-format_names_link <- function(names, kinds = NULL , type = "par", target = FALSE, inline = FALSE, latex = FALSE) {
+#format_names_link <- function(names, kinds = NULL , type = "par", target = FALSE, inline = FALSE, latex = FALSE) {
+format_names_link <- function(names, kinds = NULL, type = "par", target = FALSE, inline = FALSE, latex = FALSE) {
 
   escape <- ""
   if (latex) escape <- "\\"
+
+  if (type == "par") kinds <- SticsPubRTools:::get_names_kind(names = names)
 
   formatted_names <- format_names(names = names, kinds = kinds, type = type, inline = inline, latex = latex)
 
@@ -180,9 +190,25 @@ format_names_link <- function(names, kinds = NULL , type = "par", target = FALSE
   return(names_link)
 }
 
-format_names_target <- function(names, kinds = NULL , type = "par", inline = FALSE, latex = FALSE) {
+format_names_target <- function(names, kinds = NULL, type = "par", inline = FALSE, latex = FALSE) {
+  return(format_names_link(names = names, kinds = NULL, type = type, target = TRUE, inline = inline, latex = latex))
+}
 
-  return(format_names_link(names = names, kinds = kinds, type = type, target = TRUE, inline = inline, latex = latex))
+
+get_names_kind <- function(names, stics_version = "last") {
+  stics_version <- SticsRFiles:::check_version_compat(version_name = stics_version)
+  names_data <- get_names_list(type = "par", stics_version = stics_version)
+
+  kinds <- rep(NA, length(names))
+  idx_names <- names %in% names_data$name
+  kinds[idx_names] <-  names_data$kind[names_data$name %in% names[idx_names]]
+
+  if ( !all(idx_names) ) {
+    warning(paste(names[!idx_names],collapse = ","),": unknown name(s) !")
+  }
+
+  kinds
+
 }
 
 
@@ -208,10 +234,11 @@ dico_kind_to_index <- function( kind = NULL) {
 
 
   kind <- make.names(kind)
+  idx <- kind %in% names(kinds)
 
-  if ( ! kind %in% names(kinds) ) return()
 
-  return(kinds[[kind]])
+  indexes <- unlist(lapply(kind[idx], function(x) kinds[[x]]))
+  return(indexes)
 
 }
 
@@ -236,22 +263,31 @@ make_pattern <- function(name, symbol = c("_", "."), where = NULL) {
 
 
 
-all_int_var <- function(version = "last"){
+all_int_var <- function(version = "last", lib = FALSE){
+
+  # lib = FALSE, searching locally in the book project dir
+  # lib = TRUE, searching in the lib path in SticsRFiles installed package
 
   # DISABLED FOR THE MOMENT
   # Checking and getting the right version
-  # version <- SticsRFiles:::check_version_compat( version_name = version)
+  version <- SticsRFiles:::check_version_compat( version_name = version)
   # file_path <- file.path(SticsRFiles:::get_examples_path( file_type = "csv", version_name = version ), "internal_variables_v10.csv")
 
   # ALTERNATIVE: USING THE BOOK PROJECT FILE
   #file_path <- file.path(rstudioapi::getActiveProject(),"data","internal_variables_v10.csv")
-  file_path <- file.path(getwd(),"data","internal_variables_v10.csv")
+  if (!lib) {
+    # working in Stics book directory
+    file_path <- file.path(getwd(),"data","internal_variables_v10.csv")
+  } else {
+    dir <- file.path(Sys.getenv()["R_LIBS_USER"],"SticsRFiles","extdata","csv", version)
+    file_path <- file.path(dir,"internal_variables_v10.csv")
+  }
 
   if (!file.exists(file_path)) return(invisible(data.frame()))
 
   var_df <- utils::read.csv2(file_path,
-    header = TRUE,
-    stringsAsFactors = FALSE)[,1:4]
+                             header = TRUE,
+                             stringsAsFactors = FALSE)[,1:4]
 
   names(var_df) <- c("name", "definition", "unit", "internal")
 
