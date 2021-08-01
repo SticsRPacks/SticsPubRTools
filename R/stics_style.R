@@ -1,26 +1,28 @@
 
 #' Setting book_style to a ggplot object
 #'
-#' @param gg_object
+#' @param gg_object A ggplot object
+#' @param type Type of document (for selecting the appropriate style)
+#' @param ... For overloading ggplot theme elements as for theme
 #'
 #' @return a ggplot object
 #' @export
 #'
 # @examples
 set_style <- function(gg_object, type = "book", ...) {
-  gg_object + book_style(book, ...)
+  gg_object + book_style(type = type, ...)
 }
 
 #' Getting Stics book ggplot theme
 #'
 #' @param type theme adapted to docupent type (default : "book")
-#' @param ...For overloading ggplot theme elements as for theme
+#' @param ... For overloading ggplot theme elements as for theme
 #'
 #' @return a ggplot theme
 #' @export
 #'
 # @examples
-book_style <- function(type="book",...) {
+book_style <- function(type = "book",...) {
 
   font ="Times New Roman"
   font_size <- "11"
@@ -81,13 +83,13 @@ book_style <- function(type="book",...) {
     # setting the margins and removes lines and ticks. In some cases,
     # axis lines and axis ticks are things we would want to have in the chart
     # - the cookbook shows examples of how to do so.
-    axis.title = ggplot2::element_blank(),
+    #axis.title = ggplot2::element_blank(),
     axis.text = ggplot2::element_text(family=font,
                                       size=font_size,
                                       color=font_color),
     axis.text.x = ggplot2::element_text(margin=ggplot2::margin(5, b = 10)),
-    axis.ticks = ggplot2::element_blank(),
-    axis.line = ggplot2::element_blank(),
+    #axis.ticks = ggplot2::element_blank(),
+    #axis.line = ggplot2::element_blank(),
 
 
 
@@ -96,8 +98,8 @@ book_style <- function(type="book",...) {
 
   # default colors
   theme_list <- list(theme_list,
-                     ggplot::scale_color_manual(values = theme_colors),
-                     ggplot::scale_fill_manual(values = theme_colors))
+                     ggplot2::scale_color_manual(values = theme_colors),
+                     ggplot2::scale_fill_manual(values = theme_colors))
 
   # Manage modifiers given as ... arguments
   args <- list(...)
@@ -107,13 +109,13 @@ book_style <- function(type="book",...) {
     theme_colors <- args$custom_cols
   }
   theme_list <- list(theme_list,
-                     ggplot::scale_color_manual(values = theme_colors ),
-                     ggplot::scale_fill_manual(values = theme_colors))
+                     ggplot2::scale_color_manual(values = theme_colors ),
+                     ggplot2::scale_fill_manual(values = theme_colors))
 
 
   # remove legend
   if (detect_arg(args, "legend") && !args$legend) {
-    theme_list <- list(theme_list, theme(legend.position = "none"))
+    theme_list <- list(theme_list, ggplot2::theme(legend.position = "none"))
   }
 
 
