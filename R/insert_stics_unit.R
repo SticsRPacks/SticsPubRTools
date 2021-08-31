@@ -7,9 +7,9 @@ insert_stics_unit <- function(name, braces = TRUE) {
 
 
 
-format_unit <- function(unit) {
-  paste0("$",make_unit_pattern(unit),"$")
-}
+# format_unit <- function(unit) {
+#   paste0("$",make_unit_pattern(unit),"$")
+# }
 
 # TODO: evaluate if usefull
 units_list <- function(unit) {
@@ -92,7 +92,9 @@ format_unit <- function(unit, escape = TRUE) {
 
 
 
-  return(paste0("$",rep,"$"))
+  #return(paste0("$",rep,"$"))
+  # using a normal font for unites in math mode
+  return(paste0("$\\mathrm{",rep,"}$"))
 
 
 }
