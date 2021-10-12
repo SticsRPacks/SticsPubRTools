@@ -176,9 +176,16 @@ theme_stics <- function(type = "book",...) {
                        ggplot2::scale_fill_manual(values = theme_colors))
   }
 
-
-  # lines type, using default theme_linetypes list
-  base_theme <- list(base_theme, scale_linetype_manual(values=theme_linetypes))
+  # Choosing line types, default theme_linetypes or custom line types given in custom_lines arg
+  if (detect_arg(args_list, "custom_lines")) {
+    # theme_colors <- args_list$custom_lines
+    base_theme <- list(base_theme,
+                       ggplot2::scale_linetype_manual(values = args_list$custom_lines))
+  } else {
+    # default line types
+    base_theme <- list(base_theme,
+                       ggplot2::scale_linetype_manual(values = theme_linetypes))
+  }
 
   #base_theme <- list(base_theme, plot_geom_line)
 
