@@ -32,14 +32,15 @@ theme_stics <- function(type = "book",...) {
   theme_linetypes <- c("twodash", "solid", "longdash", "dotted", "dotdash", "dashed", "blank")
 
   # Default formatting for text
-  default_text <- text(family=font,
+  default_text <- set_text(family=font,
                        face = face,
                        size=font_size,
-                       color=font_color)
+                       colour=font_color)
   # title text
-  title_text <- text(default_text,
+  title_text <- set_text(default_text,
                      size=12,
-                     face="bold")
+                     face="bold",
+                     colour=font_color)
 
   # Axis
   axis_line <- ggplot2::element_line(
@@ -61,7 +62,7 @@ theme_stics <- function(type = "book",...) {
     # ggplot background colour from the plot
     panel.background = ggplot2::element_blank(),
 
-    #Strip background
+    # Strip background
     # This sets the panel background for facet-wrapped plots
     #strip.background = ggplot2::element_rect(fill="grey90"),
     strip.background = ggplot2::element_rect(fill="lightgrey"),
@@ -94,11 +95,11 @@ theme_stics <- function(type = "book",...) {
     axis.title.y.left = default_text,
     axis.title.y.right = default_text,
     axis.text = default_text,
-    axis.text.x = text(default_text, margin=ggplot2::margin(5, b = 10)),
+    axis.text.x = set_text(default_text, margin=ggplot2::margin(5, b = 10)),
     axis.text.y.left = default_text,
     axis.text.y.right = default_text,
-    axis.ticks = ggplot2::element_line(),
-    axis.line = ggplot2::element_line(),
+    axis.ticks = axis_line,
+    axis.line = axis_line,
     axis.line.x.bottom = axis_line,
     axis.ticks.x.bottom = axis_line,
     axis.line.y.left = axis_line,
@@ -300,7 +301,7 @@ get_legend_position <- function(value) {
 
 
 # text element, generator , modifier
-text <- function(elt_t = NULL,...) {
+set_text <- function(elt_t = NULL,...) {
 
   # Font
   # face values: "plain", "italic", "bold", "bold.italic"
@@ -314,7 +315,7 @@ text <- function(elt_t = NULL,...) {
     return(ggplot2::element_text())
   }
 
-  fields <- names(elt_t)
+  fields <- c(names(elt_t), "color")
   args <- list(...)
   if (!length(args)) return(fields[1:8])
 
