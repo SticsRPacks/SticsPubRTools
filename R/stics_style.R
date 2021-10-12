@@ -1,4 +1,4 @@
-#' Setting stics_theme to a ggplot object
+#' Setting theme_stics to a ggplot object
 #'
 #' @param gg_object A ggplot object
 #' @param type Type of document (for selecting the appropriate style)
@@ -9,7 +9,7 @@
 #'
 # @examples
 set_style <- function(gg_object, type = "book", ...) {
-  gg_object + stics_theme(type = type, ...)
+  gg_object + theme_stics(type = type, ...)
 }
 
 #' Getting Stics book ggplot theme
@@ -21,18 +21,25 @@ set_style <- function(gg_object, type = "book", ...) {
 #' @export
 #'
 # @examples
-stics_theme <- function(type = "book",...) {
+theme_stics <- function(type = "book",...) {
 
   font ="Times New Roman"
+  face = "plain"
   font_size <- "11"
   font_color <- "#222222"
   theme_colors <- c("#FFDB6D", "#C4961A", "#F4EDCA", "#D16103", "#C3D7A4",
                     "#52854C", "#4E84C4", "#293352")
+  theme_linetypes <- c("twodash", "solid", "longdash", "dotted", "dotdash", "dashed", "blank")
 
   # Default formatting for text
   default_text <- text(family=font,
+                       face = face,
                        size=font_size,
                        color=font_color)
+  # title text
+  title_text <- text(default_text,
+                     size=12,
+                     face="bold")
 
   # Axis
   axis_line <- ggplot2::element_line(
@@ -42,9 +49,9 @@ stics_theme <- function(type = "book",...) {
 
   # Line
   plot_geom_line <- ggplot2::geom_line(
-    color = font_color,
-    size = 0.5,
-    linetype = "solid")
+    #color = font_color,
+    size = 0.2)#,
+    #linetype = "solid")
 
   # Default theme options
   base_theme <- ggplot2::theme(
@@ -55,65 +62,41 @@ stics_theme <- function(type = "book",...) {
     panel.background = ggplot2::element_blank(),
 
     #Strip background
-    # This sets the panel background for facet-wrapped plots to white,
-    # removing the standard grey ggplot background colour and sets the title
-    # size of the facet-wrap title to font size 22)
-    strip.background = ggplot2::element_rect(fill="white"),
-    #strip.text = ggplot2::element_text(size  = 22,  hjust = 0),
+    # This sets the panel background for facet-wrapped plots
+    #strip.background = ggplot2::element_rect(fill="grey90"),
+    strip.background = ggplot2::element_rect(fill="lightgrey"),
     # using text modifier function
-    strip.text = text(default_text, size=22,  hjust = 0),
+    strip.text = default_text,
 
     # Grid lines
     #This removes all minor gridlines and adds major y gridlines.
-    # In many cases you will want to change this to remove y gridlines
-    # and add x gridlines. The cookbook shows you examples for doing so
     panel.grid.minor = ggplot2::element_blank(),
+    panel.grid.major = ggplot2::element_blank(),
     #panel.grid.major.y = ggplot2::element_line(color="#cbcbcb"),
     #panel.grid.major.x = ggplot2::element_blank(),
-    panel.grid.major = ggplot2::element_blank(),
-
 
 
     # Text format
-    #This sets the font, size, type and colour of text
-    # plot.title = ggplot2::element_text(family=font,
-    #                                    size=28,
-    #                                    face="bold",
-    #                                    color=font_color),
-    # using text modifier function
-    plot.title = text(default_text, size=12, face="bold"),
+    plot.title = title_text,
     # Legend format
-    # This sets the position and alignment of the legend, removes a title and
-    # backround for it and sets the requirements for any text within the legend.
-    # The legend may often need some more manual tweaking when it comes to its
-    # exact position based on the plot coordinates.
     legend.position = "right",
     legend.text.align = 0,
     legend.background = ggplot2::element_blank(),
     legend.title = ggplot2::element_blank(),
     legend.key = ggplot2::element_blank(),
-    # legend.text = ggplot2::element_text(family=font,
-    #                                     size=font_size,
-    #                                     color=font_color),
-    # using text modifier function
     legend.text = default_text,
 
     # Axis format
-    # This sets the text font, size and colour for the axis test, as well as
-    # setting the margins and removes lines and ticks. In some cases,
-    # axis lines and axis ticks are things we would want to have in the chart
-    # - the cookbook shows examples of how to do so.
-    #axis.title = ggplot2::element_blank(),
-    # axis.text = ggplot2::element_text(family=font,
-    #                                   size=font_size,
-    #                                   color=font_color),
     # using text modifier function
+    axis.title = default_text,
+    axis.title.x = default_text,
+    axis.title.y = default_text,
+    axis.title.y.left = default_text,
+    axis.title.y.right = default_text,
     axis.text = default_text,
-    #axis.text.x = ggplot2::element_text(margin=ggplot2::margin(5, b = 10)),
     axis.text.x = text(default_text, margin=ggplot2::margin(5, b = 10)),
     axis.text.y.left = default_text,
     axis.text.y.right = default_text,
-
     axis.ticks = ggplot2::element_line(),
     axis.line = ggplot2::element_line(),
     axis.line.x.bottom = axis_line,
@@ -180,7 +163,7 @@ stics_theme <- function(type = "book",...) {
   # mettre aes dans le ggplot ... A TESTER !!!!
 
 
-  # Choosing colors, default or custom palette given in custom_cols arg
+  # Choosing colors, default theme_colors or custom palette given in custom_cols arg
   if (detect_arg(args_list, "custom_cols")) {
     # theme_colors <- args_list$custom_cols
     base_theme <- list(base_theme,
@@ -194,7 +177,10 @@ stics_theme <- function(type = "book",...) {
   }
 
 
+  # lines type, using default theme_linetypes list
+  base_theme <- list(base_theme, scale_linetype_manual(values=theme_linetypes))
 
+  #base_theme <- list(base_theme, plot_geom_line)
 
 
   # TODO
@@ -309,6 +295,9 @@ get_legend_position <- function(value) {
 # text element, generator , modifier
 text <- function(elt_t = NULL,...) {
 
+  # Font
+  # face values: "plain", "italic", "bold", "bold.italic"
+
   if (is.null(elt_t)) {
     elt_t <- ggplot2::element_text()
   }
@@ -333,7 +322,10 @@ text <- function(elt_t = NULL,...) {
   elt_t
 }
 
-
+# panel blank
+blank.panel <- function() {
+  ggplot2::element_blank()
+}
 
 
 
