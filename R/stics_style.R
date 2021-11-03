@@ -33,14 +33,14 @@ theme_stics <- function(type = "book",...) {
 
   # Default formatting for text
   default_text <- set_text(family=font,
-                       face = face,
-                       size=font_size,
-                       colour=font_color)
+                           face = face,
+                           size=font_size,
+                           colour=font_color)
   # title text
   title_text <- set_text(default_text,
-                     size=12,
-                     face="bold",
-                     colour=font_color)
+                         size=12,
+                         face="bold",
+                         colour=font_color)
 
   # Axis
   axis_line <- ggplot2::element_line(
@@ -52,7 +52,7 @@ theme_stics <- function(type = "book",...) {
   plot_geom_line <- ggplot2::geom_line(
     #color = font_color,
     size = 0.2)#,
-    #linetype = "solid")
+  #linetype = "solid")
 
   # Default theme options
   base_theme <- ggplot2::theme(
@@ -76,6 +76,8 @@ theme_stics <- function(type = "book",...) {
     #panel.grid.major.y = ggplot2::element_line(color="#cbcbcb"),
     #panel.grid.major.x = ggplot2::element_blank(),
 
+    # panel
+    panel.border = ggplot2::element_blank(),
 
     # Text format
     plot.title = title_text,
@@ -98,14 +100,16 @@ theme_stics <- function(type = "book",...) {
     axis.text.x = set_text(default_text, margin=ggplot2::margin(5, b = 10)),
     axis.text.y.left = default_text,
     axis.text.y.right = default_text,
-    axis.ticks = axis_line,
     axis.line = axis_line,
+    axis.ticks = axis_line,
     axis.line.x.bottom = axis_line,
     axis.ticks.x.bottom = axis_line,
+    axis.line.x.top = ggplot2::element_blank(),
+    axis.ticks.x.top = ggplot2::element_blank(),
     axis.line.y.left = axis_line,
     axis.ticks.y.left = axis_line,
-    axis.line.y.right = axis_line,
-    axis.ticks.y.right = axis_line,
+    axis.line.y.right = ggplot2::element_blank(),
+    axis.ticks.y.right = ggplot2::element_blank()
 
   )
 
@@ -149,6 +153,23 @@ theme_stics <- function(type = "book",...) {
     base_theme <- base_theme + legend(what = "angle", value = args_list$legend.angle)
   }
 
+
+  if (detect_arg(args_list, "x.axis")) {
+    if (args_list$x.axis == "top")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.line.x.top = axis_line, axis.ticks.x.top = axis_line)
+  }
+
+  if (detect_arg(args_list, "y.axis")) {
+    if (args_list$y.axis == "both")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.line.y.right = axis_line, axis.ticks.y.right = axis_line,
+                       axis.line.y.left = axis_line, axis.ticks.y.left = axis_line)
+    if (args_list$y.axis == "left")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.line.y.right = element_blank(), axis.ticks.y.right = element_blank(),
+                       axis.line.y.left = axis_line, axis.ticks.y.left = axis_line)
+  }
 
 
   # Definition of lines (see at the beginning of the theme function)
