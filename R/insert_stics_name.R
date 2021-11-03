@@ -31,7 +31,7 @@ insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE, l
 # Call this function for getting parameters or variables names from SticsRFiles pkg
 #
 # @export
-get_names_list <- function(type = "par", stics_version = "last") {
+get_names_list <- function(type = "par", stics_version = "latest") {
 
   types_list <- c("par", "var", "int", "all")
 
@@ -195,7 +195,7 @@ format_names_target <- function(names, kinds = NULL, type = "par", inline = FALS
 }
 
 
-get_names_kind <- function(names, stics_version = "last") {
+get_names_kind <- function(names, stics_version = "latest") {
   stics_version <- SticsRFiles:::check_version_compat(version_name = stics_version)
   names_data <- get_names_list(type = "par", stics_version = stics_version)
 
@@ -263,7 +263,7 @@ make_pattern <- function(name, symbol = c("_", "."), where = NULL) {
 
 
 
-all_int_var <- function(version = "last", lib = FALSE){
+all_int_var <- function(version = "latest", lib = FALSE){
 
   # lib = FALSE, searching locally in the book project dir
   # lib = TRUE, searching in the lib path in SticsRFiles installed package
