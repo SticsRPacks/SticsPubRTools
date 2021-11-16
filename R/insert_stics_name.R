@@ -183,7 +183,7 @@ format_names_link <- function(names, kinds = NULL, type = "par", target = FALSE,
     fmt <- "[%s]{#%s-%s}"
     names_link <- sprintf(fmt = fmt, formatted_names, type, names_label )
   } else {
-    fmt <- paste0("[%s](#%s-%s) ", escape,"\\index{%s}")
+    fmt <- paste0("[%s](#%s-%s)", escape,"\\index{%s}")
     names_link <- sprintf(fmt = fmt, formatted_names, type, names_label, names )
   }
 
