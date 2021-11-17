@@ -56,7 +56,7 @@ find_stics_names <- function(viewer = "pane") {
   }
   "
   stics_versions <- SticsRFiles::get_stics_versions_compat()$versions_list
-  last_version <- SticsRFiles::get_stics_versions_compat()$last_version
+  latest_version <- SticsRFiles::get_stics_versions_compat()$latest_version
 
   # Taking into account an existing word selection in the IDE
   prev_text_sel <- get_doc_word_selection()
@@ -81,7 +81,7 @@ find_stics_names <- function(viewer = "pane") {
                                           shiny::fillCol(width = "70%",
                                                          shiny::selectInput(inputId = "version", label = shiny::strong("Stics version"),
                                                                             choices = stics_versions,
-                                                                            selected = last_version))
+                                                                            selected = latest_version))
                            ),
 
                            shiny::fillRow(height = "30%",
