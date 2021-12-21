@@ -14,14 +14,14 @@ set_style <- function(gg_object, type = "book", ...) {
 
 #' Getting Stics book ggplot theme
 #'
-#' @param type theme adapted to docupent type (default : "book")
+#' @param type theme adapted to document type (default : "book")
 #' @param ... For overloading ggplot theme elements as for theme
 #'
 #' @return a ggplot theme
 #' @export
 #'
 # @examples
-theme_stics <- function(type = "book",...) {
+theme_stics <- function(type = "book", grey_scale = FALSE,...) {
 
   font ="Times New Roman"
   face = "plain"
@@ -29,6 +29,8 @@ theme_stics <- function(type = "book",...) {
   font_color <- "#222222"
   theme_colors <- c("#FFDB6D", "#C4961A", "#F4EDCA", "#D16103", "#C3D7A4",
                     "#52854C", "#4E84C4", "#293352")
+
+
   theme_linetypes <- c("twodash", "solid", "longdash", "dotted", "dotdash", "dashed", "blank")
 
   # Default formatting for text
@@ -48,6 +50,30 @@ theme_stics <- function(type = "book",...) {
     size = 0.3,
     linetype = "solid")
 
+  axis_title_x <- ggplot2::element_text(
+    color = font_color,
+    face = face,
+    family = font,
+    size = font_size,
+    hjust = 1.2,
+    vjust = 0,
+    margin = margin(b = 0))
+
+  axis_title_y <- ggplot2::element_text(
+    color = font_color,
+    face = face,
+    family = font,
+    size = font_size,
+    angle = 0)
+
+  axis_title_y_left <- ggplot2::element_text(margin = margin(l = 0),
+                                             hjust = 0,
+                                             vjust = 1.2)
+
+  axis_title_y_right <- ggplot2::element_text(margin = margin(r = 0),
+                                              vjust = 1.2,
+                                              hjust = 1.2)
+
   # Line
   plot_geom_line <- ggplot2::geom_line(
     #color = font_color,
@@ -61,6 +87,9 @@ theme_stics <- function(type = "book",...) {
     # This sets the panel background as blank, removing the standard grey
     # ggplot background colour from the plot
     panel.background = ggplot2::element_blank(),
+
+    # margin around the plot
+    plot.margin = margin(1.5,1.5,1.5,1.5, unit = 'cm'),
 
     # Strip background
     # This sets the panel background for facet-wrapped plots
@@ -92,10 +121,10 @@ theme_stics <- function(type = "book",...) {
     # Axis format
     # using text modifier function
     axis.title = default_text,
-    axis.title.x = default_text,
-    axis.title.y = default_text,
-    axis.title.y.left = default_text,
-    axis.title.y.right = default_text,
+    axis.title.x = axis_title_x,
+    axis.title.y = axis_title_y,
+    axis.title.y.left = axis_title_y_left,
+    axis.title.y.right = axis_title_y_right,
     axis.text = default_text,
     axis.text.x = set_text(default_text, margin=ggplot2::margin(5, b = 10)),
     axis.text.y.left = default_text,
@@ -129,30 +158,28 @@ theme_stics <- function(type = "book",...) {
   }
   # for removing legend title: FALSE
   if (detect_arg(args_list, "legend.title")) {
-    # Add treatment for title !!!!
     base_theme <- base_theme + legend(what = "title", value = args_list$legend.title)
   }
 
   if (detect_arg(args_list, "legend.face")) {
-    # Add treatment for title !!!!
     base_theme <- base_theme + legend(what = "face", value = args_list$legend.face)
   }
 
   if (detect_arg(args_list, "legend.colour")) {
-    # Add treatment for title !!!!
     base_theme <- base_theme + legend(what = "colour", value = args_list$legend.colour)
   }
 
   if (detect_arg(args_list, "legend.size")) {
-    # Add treatment for title !!!!
     base_theme <- base_theme + legend(what = "size", value = args_list$legend.size)
   }
 
   if (detect_arg(args_list, "legend.angle")) {
-    # Add treatment for title !!!!
     base_theme <- base_theme + legend(what = "angle", value = args_list$legend.angle)
   }
 
+  if (detect_arg(args_list, "legend.labels")) {
+    base_theme <- base_theme + legend(what = "labels", value = args_list$legend.labels)
+  }
 
   if (detect_arg(args_list, "x.axis")) {
     if (args_list$x.axis == "top")
@@ -169,7 +196,57 @@ theme_stics <- function(type = "book",...) {
       base_theme <- base_theme +
         ggplot2::theme(axis.line.y.right = element_blank(), axis.ticks.y.right = element_blank(),
                        axis.line.y.left = axis_line, axis.ticks.y.left = axis_line)
+    if (args_list$y.axis == "right")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.line.y.left = element_blank(), axis.ticks.y.left = element_blank(),
+                       axis.line.y.right = axis_line, axis.ticks.y.right = axis_line)
+    if (args_list$y.axis == "none")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.line.y.right = element_blank(), axis.ticks.y.right = element_blank(),
+                       axis.line.y.left = element_blank(), axis.ticks.y.left = element_blank())
   }
+
+  # axis title display
+  if (detect_arg(args_list, "axis.title")) {
+    if (args_list$axis.title == "none")
+      base_theme <- base_theme + ggplot2::theme(axis.title.x = element_blank(),
+                                                axis.title.y.left = element_blank(),
+                                                axis.title.y.right = element_blank())
+  }
+
+
+  if (detect_arg(args_list, "axis.title.y.left")) {
+
+    if (is.numeric(args_list$axis.title.y.left))
+    base_theme <- base_theme +
+        ggplot2::theme(axis.title.y.left =
+                         element_text(hjust = args_list$axis.title.y.left[1],
+                                      vjust = args_list$axis.title.y.left[2]))
+    if (is.character(args_list$axis.title.y.left) && args_list$axis.title.y.left=="top")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.title.y.left = element_text(hjust = 0, vjust = 1.2))
+
+    if (is.character(args_list$axis.title.y.left) && args_list$axis.title.y.left=="bottom")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.title.y.left = element_text(hjust = 0, vjust = 0))
+
+    if (is.character(args_list$axis.title.y.left) && args_list$axis.title.y.left=="none")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.title.y.left = element_blank())
+  }
+
+  if (detect_arg(args_list, "axis.title.x.bottom")) {
+   # "left", "right", "non", numeric
+  }
+
+
+  # axis title position
+  # voir fonction legend la généraliser: function axis -> plot_elt, ggelt: legend, axis ...
+  # ggelt <- function(elt, what, value) {
+  # elt: ggplot elt: axis, legend,...
+  # what: what to modify ...
+  # value to set to attribute of the elt ...
+  #}
 
 
   # Definition of lines (see at the beginning of the theme function)
@@ -185,29 +262,74 @@ theme_stics <- function(type = "book",...) {
   # mettre aes dans le ggplot ... A TESTER !!!!
 
 
+  base_theme <- list(base_theme)
+
   # Choosing colors, default theme_colors or custom palette given in custom_cols arg
-  if (detect_arg(args_list, "custom_cols")) {
-    # theme_colors <- args_list$custom_cols
-    base_theme <- list(base_theme,
-                       ggplot2::scale_color_manual(values = args_list$custom_cols),
-                       ggplot2::scale_fill_manual(values = args_list$custom_cols))
+  if (detect_arg(args_list, "custom_cols") ) {
+    print("custom_cols detected !")
+    base_theme <- c(base_theme,
+                    ggplot2::scale_color_manual(values = args_list$custom_cols),
+                    ggplot2::scale_fill_manual(values = args_list$custom_cols))
   } else {
     # default colors
-    base_theme <- list(base_theme,
-                       ggplot2::scale_color_manual(values = theme_colors),
-                       ggplot2::scale_fill_manual(values = theme_colors))
+    base_theme <- c(base_theme,
+                    ggplot2::scale_color_manual(values = theme_colors),
+                    ggplot2::scale_fill_manual(values = theme_colors))
+  }
+
+  if (grey_scale) {
+    if (detect_arg(args_list, "custom_cols") ) {
+      # print("custom_cols detected to grey cols !")
+      # custom_scale <- unique(args_list$custom_cols)
+      # custom_grey_scale <- gray.colors(length(custom_scale))
+      # col_ids <- unlist(lapply(args_list$custom_cols, function(x) which(x == custom_scale)))
+      # custom_grey_cols <- custom_grey_scale[col_ids]
+      # # hack to pass through col number
+      # custom_grey_cols <- c(custom_grey_cols, "black", "black", "black")
+      #
+      # base_theme <- c(base_theme,
+      #                 ggplot2::scale_color_grey(custom_grey_cols),
+      #                 ggplot2::scale_fill_grey(custom_grey_cols))
+
+      custom_grey_cols <-  grey_cols(custom_cols = args_list$custom_cols)
+    } else {
+      # # default colors
+      # base_theme <- c(base_theme,
+      #                 ggplot2::scale_color_manual(gray.colors(length(theme_colors))),
+      #                 ggplot2::scale_fill_manual(gray.colors(length(theme_colors))))
+      custom_grey_cols <-  grey_cols(n = length(theme_colors))
+    }
+
+
+    base_theme <- c(base_theme,
+                    ggplot2::scale_color_manual(custom_grey_cols),
+                    ggplot2::scale_fill_manual(custom_grey_cols))
   }
 
   # Choosing line types, default theme_linetypes or custom line types given in custom_lines arg
   if (detect_arg(args_list, "custom_lines")) {
-    # theme_colors <- args_list$custom_lines
-    base_theme <- list(base_theme,
-                       ggplot2::scale_linetype_manual(values = args_list$custom_lines))
+    print("custom_lines detected !")
+    base_theme <- c(base_theme,
+                    ggplot2::scale_linetype_manual(values = args_list$custom_lines))
   } else {
     # default line types
-    base_theme <- list(base_theme,
-                       ggplot2::scale_linetype_manual(values = theme_linetypes))
+    base_theme <- c(base_theme,
+                    ggplot2::scale_linetype_manual(values = theme_linetypes))
   }
+
+  # if (detect_arg(args_list, "custom_labs")) {
+  #   print("custom_labs detected !")
+  #   base_theme <- list(base_theme,
+  #                      ggplot2::scale_color_manual(labels = args_list$custom_labs))#,
+  #                      #ggplot2::scale_fill_manual(labels = args_list$custom_labs))
+  # }
+
+
+
+
+
+  # voir scale_size_manual
+
 
   #base_theme <- list(base_theme, plot_geom_line)
 
@@ -223,6 +345,28 @@ theme_stics <- function(type = "book",...) {
 
 
 # Theme modifiers
+grey_cols  <- function(custom_cols = NULL, n = NULL) {
+
+  # check inputs
+
+  args <- c(custom_cols,n)
+  if (is.null(args) | length(args) > 1) stop("only cols or cols number must be given!")
+
+  if (!is.null(custom_cols)) {
+    custom_scale <- unique(custom_cols)
+    custom_grey_scale <- gray.colors(length(custom_scale))
+    col_ids <- unlist(lapply(args_list$custom_cols, function(x) which(x == custom_scale)))
+    custom_grey_cols <- custom_grey_scale[col_ids]
+    # hack to pass through col number
+    custom_grey_cols <- c(custom_grey_cols, "black", "black", "black")
+  }
+
+  # n is provided
+  custom_grey_cols <- gray.colors(n)
+
+  return(custom_grey_cols)
+}
+
 
 # Legend modifiers
 legend <- function(what, value) {
@@ -247,6 +391,9 @@ legend <- function(what, value) {
 
     if ("justification" %in% names(value)) t <- t +
         ggplot2::theme("legend.justification" = value$justification)
+
+
+    #if (what == "labels") return(ggplot2::theme("legend.title" = value))
 
     return(t)
 
@@ -313,6 +460,37 @@ get_legend_position <- function(value) {
 
 
 # Colors modifiers
+
+#' Switching a ggplot object to grey theme
+#' @param ggplot_obj a ggplot object
+#' @param col_levels number of grey levels
+#' @param switch_flag logical indicating to switch (TRUE) not (FALSE) to a grey scale
+#'
+#' @return a ggplot object
+#' @export
+#'
+# @examples
+switch_to_grey <- function(ggplot_obj, col_levels = NULL, switch_flag = FALSE) {
+
+  # Switch flag may be given by switch_flag = knitr::is_latex_output()
+  # or conjunction of this one plus black and white other flag
+
+  if (! switch_flag) return(ggplot_obj)
+
+  # try to bet levels number from ggplot_obj data from the first col
+  # if col_levels == NULL
+  # TODO: test if class == factors
+  if (is.null(col_levels)) {
+    if (is.factor(ggplot_obj$data[[1]])) {
+      col_levels <- length(levels(ggplot_obj$data[[1]]))
+    } else {
+      col_levels <- length(unique(ggplot_obj$data[[1]]))
+    }
+  }
+
+  ggplot_obj + scale_colour_grey(gray.colors(col_levels)) # + theme_bw()
+
+}
 
 
 # axes ?
