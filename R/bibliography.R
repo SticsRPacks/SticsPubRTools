@@ -104,7 +104,8 @@ gen_bibtex_file <- function( file_dir = getwd(),
   RefManageR::WriteBib( bib = BibEntry_obj,
                         file = file_path,
                         biblatex = FALSE,
-                        verbose = TRUE)
+                        verbose = TRUE,
+                        useBytes = TRUE)
 
   if (verbose) {
     cat(sprintf("%s %s %s: %s\n",
@@ -210,7 +211,8 @@ get_references <- function(library_name,
                            verbose = FALSE) {
 
   # Fixing options for just warning
-  RefManageR::BibOptions(check.entries = "warn")
+  #RefManageR::BibOptions(check.entries = "wanr")
+  RefManageR::BibOptions(check.entries = FALSE)
 
   # First query (will contain the merged queries resutls in the end)
   BibEntry_obj_full <- read_zotero_references( library_name = library_name,
@@ -290,11 +292,14 @@ read_zotero_references <- function(library_name,
                               collection_name = collection_name,
                               limit = number)
 
-  invisible(utils::capture.output(
-    r <- RefManageR::ReadZotero(group = group_id, .params = params)
-  ))
+  # invisible(utils::capture.output(
+  #   r <- RefManageR::ReadZotero(group = group_id, .params = params, delete.file = FALSE)
+  # ))
 
-  #r <- RefManageR::ReadZotero(group = group_id, .params = params, delete.file = FALSE)
+  r <- RefManageR::ReadZotero(group = group_id, .params = params, delete.file = FALSE)
+
+
+  #print(start)
 
 
 
@@ -391,6 +396,8 @@ get_collections <- function() {
   collections <- list()
   collections$sticsredbook2020 <- "5BN7SQTX"
   collections$EPS_stics <- "HWSYUI79"
+  #collections$tmp_ref <- "MJE6ESVH"
+  collections$thesis <- "JAW7JPU8"
 
   return(collections)
 }
