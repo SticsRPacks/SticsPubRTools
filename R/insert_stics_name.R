@@ -37,7 +37,7 @@ get_names_list <- function(type = "par", stics_version = "latest") {
 
   if ( ! type %in% types_list ) stop()
 
-  stics_version <- SticsRFiles:::check_version_compat(version_name = stics_version)
+  stics_version <- SticsRFiles:::check_version_compat(stics_version = stics_version)
 
 
 
@@ -56,26 +56,26 @@ get_names_list <- function(type = "par", stics_version = "latest") {
 
   if ( type == "par" ) {
     # For inputs.csv
-    names <- SticsRFiles:::get_param_desc(version = stics_version)
+    names <- SticsRFiles:::get_param_desc(stics_version = stics_version)
     # for XML files
-    # names <- SticsRFiles::get_param_info(parameter = name, version = stics_version)$name
+    # names <- SticsRFiles::get_param_info(parameter = name, stics_version = stics_version)$name
   }
 
   if ( type == "var" ) {
     # For outputs.csv
-    names <- SticsRFiles::get_var_info(version = stics_version)
+    names <- SticsRFiles::get_var_info(stics_version = stics_version)
   }
 
   if (type == "int") {
-    names <- all_int_var(version = stics_version, lib = TRUE)
+    names <- all_int_var(stics_version = stics_version, lib = TRUE)
   }
 
 
   if (type == "all") {
     names <- list()
-    names$par <- SticsRFiles:::get_param_desc(version = stics_version)
-    names$var <- SticsRFiles::get_var_info(version = stics_version)
-    names$int <- all_int_var(version = stics_version, lib = TRUE)
+    names$par <- SticsRFiles:::get_param_desc(stics_version = stics_version)
+    names$var <- SticsRFiles::get_var_info(stics_version = stics_version)
+    names$int <- all_int_var(stics_version = stics_version, lib = TRUE)
   }
   # temporarily early return, without using of environment.
   return(names)
@@ -196,7 +196,7 @@ format_names_target <- function(names, kinds = NULL, type = "par", inline = FALS
 
 
 get_names_kind <- function(names, stics_version = "latest") {
-  stics_version <- SticsRFiles:::check_version_compat(version_name = stics_version)
+  stics_version <- SticsRFiles:::check_version_compat(stics_version = stics_version)
   names_data <- get_names_list(type = "par", stics_version = stics_version)
 
   kinds <- rep(NA, length(names))
@@ -263,14 +263,14 @@ make_pattern <- function(name, symbol = c("_", "."), where = NULL) {
 
 
 
-all_int_var <- function(version = "latest", lib = FALSE){
+all_int_var <- function(stics_version = "latest", lib = FALSE){
 
   # lib = FALSE, searching locally in the book project dir
   # lib = TRUE, searching in the lib path in SticsRFiles installed package
 
   # DISABLED FOR THE MOMENT
   # Checking and getting the right version
-  version <- SticsRFiles:::check_version_compat( version_name = version)
+  version <- SticsRFiles:::check_version_compat(stics_version = stics_version)
   # file_path <- file.path(SticsRFiles:::get_examples_path( file_type = "csv", version_name = version ), "internal_variables_v10.csv")
 
   # ALTERNATIVE: USING THE BOOK PROJECT FILE
