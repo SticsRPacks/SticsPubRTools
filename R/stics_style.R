@@ -55,7 +55,7 @@ theme_stics <- function(type = "book", grey_scale = FALSE,...) {
     face = face,
     family = font,
     size = font_size,
-    hjust = 1.2,
+    hjust = 1,
     vjust = 0,
     margin = margin(b = 0))
 
@@ -66,13 +66,17 @@ theme_stics <- function(type = "book", grey_scale = FALSE,...) {
     size = font_size,
     angle = 0)
 
-  axis_title_y_left <- ggplot2::element_text(margin = margin(l = 0),
-                                             hjust = 0,
-                                             vjust = 1.2)
+  axis_title_y_left <- add_elt_text(axis_title_y,
+                                    ggplot2::element_text(margin = margin(l = 0),
+                                                          hjust = 0,
+                                                          vjust = 1)
+  )
 
-  axis_title_y_right <- ggplot2::element_text(margin = margin(r = 0),
-                                              vjust = 1.2,
-                                              hjust = 1.2)
+  axis_title_y_right <- add_elt_text(axis_title_y,
+                                     ggplot2::element_text(margin = margin(r = 0),
+                                                           vjust = 1,
+                                                           hjust = 1)
+  )
 
   # Line
   plot_geom_line <- ggplot2::geom_line(
@@ -146,8 +150,20 @@ theme_stics <- function(type = "book", grey_scale = FALSE,...) {
 
   # Manage modifiers given as ... arguments
   args_list <- list(...)
-  # if (length(args_list)==0) return(base_theme)
+  if (length(args_list)==0) return(base_theme)
 
+
+  # Title management
+  if (detect_arg(args_list, "title")) {
+    if (args_list$title == "none")
+    base_theme <- base_theme + theme(plot.title = element_blank())
+
+    # TODO : see for position ???
+
+  }
+
+  # legend management
+  #-----------------------------------------------------------------------------
   # set legend display: TRUE/FALSE
   # set position using keywords : "top", "bottom", "left", "right"
   # set position using keywords combination (inside plot area): "top-left"
@@ -181,17 +197,30 @@ theme_stics <- function(type = "book", grey_scale = FALSE,...) {
     base_theme <- base_theme + legend(what = "labels", value = args_list$legend.labels)
   }
 
+  # axis management
+  #-----------------------------------------------------------------------------
+  # axis display --------------------------------------------------------------
+  # x
   if (detect_arg(args_list, "x.axis")) {
     if (args_list$x.axis == "top")
       base_theme <- base_theme +
         ggplot2::theme(axis.line.x.top = axis_line, axis.ticks.x.top = axis_line)
   }
 
+  # y (left and right axis )
+  center_x_title <- FALSE
   if (detect_arg(args_list, "y.axis")) {
-    if (args_list$y.axis == "both")
+    if (args_list$y.axis == "both") {
       base_theme <- base_theme +
         ggplot2::theme(axis.line.y.right = axis_line, axis.ticks.y.right = axis_line,
                        axis.line.y.left = axis_line, axis.ticks.y.left = axis_line)
+      # centering the x axis title
+      center_x_title <- TRUE
+      base_theme <- base_theme +
+        ggplot2::theme(axis.title.x.top = element_text(hjust = 0.5, vjust = 0),
+                       axis.title.x.bottom = element_text(hjust = 0.5, vjust = 0))
+    }
+
     if (args_list$y.axis == "left")
       base_theme <- base_theme +
         ggplot2::theme(axis.line.y.right = element_blank(), axis.ticks.y.right = element_blank(),
@@ -206,19 +235,18 @@ theme_stics <- function(type = "book", grey_scale = FALSE,...) {
                        axis.line.y.left = element_blank(), axis.ticks.y.left = element_blank())
   }
 
-  # axis title display
+  # axis title display & position ----------------------------------------------
   if (detect_arg(args_list, "axis.title")) {
     if (args_list$axis.title == "none")
       base_theme <- base_theme + ggplot2::theme(axis.title.x = element_blank(),
                                                 axis.title.y.left = element_blank(),
                                                 axis.title.y.right = element_blank())
   }
-
-
+  # axis title position -------------------------------------------------------
   if (detect_arg(args_list, "axis.title.y.left")) {
 
     if (is.numeric(args_list$axis.title.y.left))
-    base_theme <- base_theme +
+      base_theme <- base_theme +
         ggplot2::theme(axis.title.y.left =
                          element_text(hjust = args_list$axis.title.y.left[1],
                                       vjust = args_list$axis.title.y.left[2]))
@@ -235,18 +263,58 @@ theme_stics <- function(type = "book", grey_scale = FALSE,...) {
         ggplot2::theme(axis.title.y.left = element_blank())
   }
 
-  if (detect_arg(args_list, "axis.title.x.bottom")) {
-   # "left", "right", "non", numeric
+  if (detect_arg(args_list, "axis.title.x.top") && !center_x_title) {
+    # "left", "right", "none", numeric
+    if (is.numeric(args_list$axis.title.x.top))
+      base_theme <- base_theme +
+        ggplot2::theme(axis.title.x.top =
+                         element_text(hjust = args_list$axis.title.x.top[1],
+                                      vjust = args_list$axis.title.x.top[2]))
+    if (is.character(args_list$axis.title.x.top) && args_list$axis.title.x.top=="left")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.title.x.top = element_text(hjust = 0, vjust = 1))
+
+    if (is.character(args_list$axis.title.x.top) && args_list$axis.title.x.top=="right")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.title.x.top = element_text(hjust = 1, vjust = 0))
+
+    if (is.character(args_list$axis.title.x.top) && args_list$axis.title.x.top=="none")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.title.x.top = element_blank())
+  }
+
+  if (detect_arg(args_list, "axis.title.x.bottom") && !center_x_title) {
+
+    # TODO: complete
+    if (is.character(args_list$axis.title.x.bottom) && args_list$axis.title.x.bottom=="none")
+      base_theme <- base_theme +
+        ggplot2::theme(axis.title.x.bottom = element_blank())
   }
 
 
-  # axis title position
+  # axis scale management ---------------------------------------------
+  # args:
+  # scale.x.limits, scale.y.limits
+  # scale.x.breaks, scale.y.breaks
+  # scale.x.expand, scal.y.expand:
+  #     scale_x_continuous("test x", limits =c(0,10),
+  #                        expand=expansion(mult=c(0.,0.02)))
+  # ou utilisation de add=c(val_to_start, val_to_end) ou
+  # encore c(val_to_start, val_to_end) sans nom arg correspondant a arg "add"
+  # scale.x.labels, scale.y.labels: list of labels
+  #
+  # ATTENTION: voir argument sec.axis des fonctions scale_x|y_continuous|discrete
+  # pour controler les parametres des axes opposés!
+  #
+  #
+  # axis title position ------------------------------------------------------
   # voir fonction legend la généraliser: function axis -> plot_elt, ggelt: legend, axis ...
   # ggelt <- function(elt, what, value) {
   # elt: ggplot elt: axis, legend,...
   # what: what to modify ...
   # value to set to attribute of the elt ...
   #}
+  # ---------------------------------------------------------------------------
 
 
   # Definition of lines (see at the beginning of the theme function)
@@ -527,6 +595,17 @@ set_text <- function(elt_t = NULL,...) {
   }
 
   elt_t
+}
+
+
+add_elt_text <- function(elt_t_a, elt_t_b) {
+
+  for (i in names(elt_t_a)) {
+    if (!is.null(elt_t_b[[i]])) {
+      elt_t_a[[i]] <- elt_t_b[[i]]
+    }
+  }
+  elt_t_a
 }
 
 # panel blank
