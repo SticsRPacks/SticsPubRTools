@@ -81,7 +81,7 @@ spec_char_dict <- function() {
 # with the right corresponding character
 replace_spec_char <- function(char_vec, pattern, replacement) {
 
-  unlist(lapply(X = char_vec, function(x) str_replace_all(x, pattern, replacement)))
+  unlist(lapply(X = char_vec, function(x) stringr::str_replace_all(x, pattern, replacement)))
 
 }
 
