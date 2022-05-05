@@ -17,7 +17,7 @@ VignetteBuilder: knitr
 Suggests: 
     testthat,
     knitr
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Imports: 
     bookdown,
     methods,
@@ -32,4 +32,5 @@ Imports:
     rstudioapi,
     ggthemes,
     patchwork,
-    rmarkdown
+    rmarkdown,
+    stringr
