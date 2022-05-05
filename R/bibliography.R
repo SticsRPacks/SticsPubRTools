@@ -163,6 +163,18 @@ update_stics_bibtex_files <- function(file_dir = getwd(),
                     verbose = TRUE)
 
   ))
+
+  # Added treatment for replacing special characters Latex encoding due to
+  # WriteBib function for author field !
+  file_name <- library_name
+  if (!is.null(collection_name)) {
+    file_name <- collection_name
+  }
+  file_path <- file.path(file_dir, paste0(file_name, ".bib"))
+
+  # replacing bib files
+  replace_file_spec_char(file = file_path, overwrite = TRUE)
+
 }
 
 

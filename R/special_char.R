@@ -79,24 +79,54 @@ spec_char_dict <- function() {
 
 # Replacing in string vector Latex encoding for an accentuated character
 # with the right corresponding character
-replace_spec_string <- function(string_vec, pattern, replacement) {
+replace_spec_char <- function(char_vec, pattern, replacement) {
 
-  unlist(lapply(X = string_vec, function(x) str_replace_all(x, pattern, replacement)))
+  unlist(lapply(X = char_vec, function(x) str_replace_all(x, pattern, replacement)))
 
 }
 
 # Replacing in string vector Latex encoding for accentuated characters
 # with the right characters, according to a correspondence dictionary
-replace_all_spec_string <- function(string_vec, dict = NULL) {
+replace_all_spec_char <- function(char_vec, dict = NULL) {
 
   if (is.null(dict))
     dict <- spec_char_dict()
 
   for (n in names(dict)) {
-    string_vec <- replace_spec_string(string_vec, pattern = n, replacement = dict[[n]])
-    print(dict[[n]])
+    char_vec <- replace_spec_char(char_vec, pattern = n, replacement = dict[[n]])
+    #print(dict[[n]])
   }
 
-  return(string_vec)
+  return(char_vec)
 }
 
+
+replace_file_spec_char <- function(file, out_file = NULL, overwrite = FALSE) {
+
+  if (length(file) > 1) {
+    lapply(file, function(x) replace_file_spec_char(x,
+                                                    out_file = x,
+                                                    overwrite = overwrite))
+    return(invisible())
+  }
+
+  if(!file.exists(file))
+    stop(file, ": does not exist!")
+
+  file_lines <- readLines(file)
+
+  if(length(file_lines) == 0)
+    stop(file, ": is empty!")
+
+  out_lines <- replace_all_spec_char(char_vec = file_lines)
+
+  if(is.null(out_file))
+    out_file <- file
+
+  if(file.exists(out_file) && !overwrite)
+    stop(out_file, ": already exists, consider setting overwrite argument to TRUE\n",
+         "or add output file name in out_file argument.")
+
+  writeLines(text = out_lines, con = out_file )
+
+}
