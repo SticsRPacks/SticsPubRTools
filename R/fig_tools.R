@@ -22,7 +22,7 @@ library(ggplot2)
 #' }
 #'
 #'
-plot_render <- function(plot_obj,
+plot_render <- function(plot_obj = last_plot(),
                         img_name = NULL,
                         img_format = "png",
                         img_dir = getwd(),
@@ -47,8 +47,8 @@ plot_render <- function(plot_obj,
 
   }
 
-  if (!is.ggplot(plot_obj) && !is.function(plot_obj))
-    stop("The plot_obj object is neither a ggplot object nor a plot function !")
+  # if (!is.ggplot(plot_obj) && !is.function(plot_obj))
+  #   stop("The plot_obj object is neither a ggplot object nor a plot function !")
 
   if(is.function(plot_obj)) {
     #print("function")
