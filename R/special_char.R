@@ -126,7 +126,7 @@ replace_file_spec_char <- function(file,
 
   # removing extra curly braces
   #out_lines <- replace_extra_braces(char_vec = out_lines,
-                                    filter_tag = line_filter)
+  #                                  filter_tag = line_filter)
 
     if(is.null(out_file))
     out_file <- file
