@@ -172,8 +172,13 @@ update_stics_bibtex_files <- function(file_dir = getwd(),
   }
   file_path <- file.path(file_dir, paste0(file_name, ".bib"))
 
-  # replacing bib files
-  replace_file_spec_char(file = file_path, overwrite = TRUE)
+  # replacing ouput bib files characters sequence with, accentuated characters
+  # and removing extra curly braces in "type" field
+  replace_file_spec_char(file = file_path,
+                         overwrite = TRUE,
+                         line_filter = c("type", "title"))
+
+
 
 }
 

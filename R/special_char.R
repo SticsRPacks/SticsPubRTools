@@ -101,7 +101,10 @@ replace_all_spec_char <- function(char_vec, dict = NULL) {
 }
 
 
-replace_file_spec_char <- function(file, out_file = NULL, overwrite = FALSE) {
+replace_file_spec_char <- function(file,
+                                   out_file = NULL,
+                                   overwrite = FALSE,
+                                   line_filter = NULL) {
 
   if (length(file) > 1) {
     lapply(file, function(x) replace_file_spec_char(x,
@@ -118,9 +121,14 @@ replace_file_spec_char <- function(file, out_file = NULL, overwrite = FALSE) {
   if(length(file_lines) == 0)
     stop(file, ": is empty!")
 
+  # replacing accentuated characters
   out_lines <- replace_all_spec_char(char_vec = file_lines)
 
-  if(is.null(out_file))
+  # removing extra curly braces
+  out_lines <- replace_extra_braces(char_vec = out_lines,
+                                    filter_tag = line_filter)
+
+    if(is.null(out_file))
     out_file <- file
 
   if(file.exists(out_file) && !overwrite)
@@ -130,3 +138,36 @@ replace_file_spec_char <- function(file, out_file = NULL, overwrite = FALSE) {
   writeLines(text = out_lines, con = out_file )
 
 }
+
+replace_extra_braces_str <- function(char) {
+
+  content <- unlist(strsplit(char, split = "\\{"))
+  field <- content[1]
+  content <- paste0(content[2:length(content)], collapse = "")
+  s1 <- gsub(pattern = "\\{", content, replacement = "")
+  s2 <- gsub(pattern = "\\},$", s1, replacement = "")
+  s2 <- gsub(pattern = "\\}", s2, replacement = "")
+
+  paste0(field, "{", s2, "},")
+
+}
+
+replace_extra_braces <- function(char_vec, filter_tag = NULL) {
+
+  vec_ids <- 1:length(char_vec)
+
+  # filter_tag one or more tags
+  if(!is.null(filter_tag)) {
+    patterns <- paste0("^\ *",filter_tag)
+    vec_ids <- unlist(lapply(patterns, function(x) grep(pattern = x, char_vec)))
+  }
+
+  char_vec[vec_ids] <- unlist(lapply(X = char_vec[vec_ids], function(x) replace_extra_braces_str(x)))
+
+  char_vec
+
+}
+
+
+
+
