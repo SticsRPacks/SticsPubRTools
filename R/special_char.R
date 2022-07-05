@@ -109,7 +109,8 @@ replace_file_spec_char <- function(file,
   if (length(file) > 1) {
     lapply(file, function(x) replace_file_spec_char(x,
                                                     out_file = x,
-                                                    overwrite = overwrite))
+                                                    overwrite = overwrite,
+                                                    line_filter = line_filter))
     return(invisible())
   }
 
