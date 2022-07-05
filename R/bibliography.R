@@ -176,7 +176,7 @@ update_stics_bibtex_files <- function(file_dir = getwd(),
   # and removing extra curly braces in "type" field
   replace_file_spec_char(file = file_path,
                          overwrite = TRUE,
-                         line_filter = c("type", "title"))
+                         line_filter = "type")
 
 
 

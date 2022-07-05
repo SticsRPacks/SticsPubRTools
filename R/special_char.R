@@ -125,10 +125,10 @@ replace_file_spec_char <- function(file,
   out_lines <- replace_all_spec_char(char_vec = file_lines)
 
   # removing extra curly braces
-  #out_lines <- replace_extra_braces(char_vec = out_lines,
-  #                                  filter_tag = line_filter)
+  out_lines <- replace_extra_braces(char_vec = out_lines,
+                                    filter_tag = line_filter)
 
-    if(is.null(out_file))
+  if(is.null(out_file))
     out_file <- file
 
   if(file.exists(out_file) && !overwrite)
@@ -146,9 +146,9 @@ replace_extra_braces_str <- function(char) {
   content <- paste0(content[2:length(content)], collapse = "")
   s1 <- gsub(pattern = "\\{", content, replacement = "")
   s2 <- gsub(pattern = "\\},$", s1, replacement = "")
-  s2 <- gsub(pattern = "\\}", s2, replacement = "")
+  s3 <- gsub(pattern = "\\}", s2, replacement = "")
 
-  paste0(field, "{", s2, "},")
+  paste0(field, "{", s3, "},")
 
 }
 
@@ -159,11 +159,15 @@ replace_extra_braces <- function(char_vec, filter_tag = NULL) {
   # filter_tag one or more tags
   if(!is.null(filter_tag)) {
     patterns <- paste0("^\ *",filter_tag)
-    vec_ids <- unlist(lapply(patterns, function(x) grep(pattern = x, char_vec)))
+    #vec_ids <- unlist(lapply(patterns, function(x) grep(pattern = x, char_vec)))
+
+    for (t in 1:length(filter_tag)){
+      vec_ids <- grep(pattern = patterns[t], char_vec)
+      new_char_vec <- unlist(lapply(X = char_vec[vec_ids], function(x) replace_extra_braces_str(x)))
+      char_vec[vec_ids] <- new_char_vec
+    }
+
   }
-
-  char_vec[vec_ids] <- unlist(lapply(X = char_vec[vec_ids], function(x) replace_extra_braces_str(x)))
-
   char_vec
 
 }
