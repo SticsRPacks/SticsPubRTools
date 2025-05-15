@@ -67,10 +67,7 @@ get_names_list <- function(type = "par", stics_version = "latest") {
 
   if (type == "par") {
     # For inputs.csv
-    names <- SticsRFiles::get_param_info(
-      parameter = name,
-      stics_version = stics_version
-    )$name
+    names <- SticsRFiles::get_param_info(stics_version = stics_version)
   }
 
   if (type == "var") {
@@ -84,7 +81,7 @@ get_names_list <- function(type = "par", stics_version = "latest") {
 
   if (type == "all") {
     names <- list()
-    names$par <- SticsRFiles:::get_param_desc(stics_version = stics_version)
+    names$par <- SticsRFiles:::get_param_info(stics_version = stics_version)
     names$var <- SticsRFiles::get_var_info(stics_version = stics_version)
     names$int <- all_int_var(stics_version = stics_version, lib = TRUE)
   }
