@@ -3,14 +3,20 @@
 # Call this function as an addin to insert \code{ Stics names } at the cursor position.
 #
 # @export
-insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE, link = FALSE, latex = FALSE) {
-
-  if ( !format && !link ) {
+insert_stics_name <- function(
+  name,
+  kind = NULL,
+  type = "par",
+  format = FALSE,
+  link = FALSE,
+  latex = FALSE
+) {
+  if (!format && !link) {
     rstudioapi::insertText(name)
     return(invisible())
   }
   # Formating name before insertion
-  if ( !link ) {
+  if (!link) {
     fname <- format_name(name = name, type = type, kind = kind, latex = latex)
     # print("formatting name")
     # print(type)
@@ -20,7 +26,13 @@ insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE, l
     return(invisible())
   }
 
-  fname <- format_names_link(names = name, kinds = kind , type = type, inline = link, latex = latex)
+  fname <- format_names_link(
+    names = name,
+    kinds = kind,
+    type = type,
+    inline = link,
+    latex = latex
+  )
   # check fname content
   rstudioapi::insertText(fname)
 }
@@ -32,14 +44,13 @@ insert_stics_name <- function(name, kind = NULL, type = "par", format = FALSE, l
 #
 # @export
 get_names_list <- function(type = "par", stics_version = "latest") {
-
   types_list <- c("par", "var", "int", "all")
 
-  if ( ! type %in% types_list ) stop()
+  if (!type %in% types_list) stop()
 
-  stics_version <- SticsRFiles:::check_version_compat(stics_version = stics_version)
-
-
+  stics_version <- SticsRFiles:::check_version_compat(
+    stics_version = stics_version
+  )
 
   # ----------------- commented: starting section using stics environment function ------------------#
   # names_var <- paste0(type, "_names")
@@ -54,14 +65,15 @@ get_names_list <- function(type = "par", stics_version = "latest") {
   #if ( ! base::is.na(names)) return(names)
   # ----------------- commented: ending section using stics environment function ------------------#
 
-  if ( type == "par" ) {
+  if (type == "par") {
     # For inputs.csv
-    names <- SticsRFiles:::get_param_desc(stics_version = stics_version)
-    # for XML files
-    # names <- SticsRFiles::get_param_info(parameter = name, stics_version = stics_version)$name
+    names <- SticsRFiles::get_param_info(
+      parameter = name,
+      stics_version = stics_version
+    )$name
   }
 
-  if ( type == "var" ) {
+  if (type == "var") {
     # For outputs.csv
     names <- SticsRFiles::get_var_info(stics_version = stics_version)
   }
@@ -69,7 +81,6 @@ get_names_list <- function(type = "par", stics_version = "latest") {
   if (type == "int") {
     names <- all_int_var(stics_version = stics_version, lib = TRUE)
   }
-
 
   if (type == "all") {
     names <- list()
@@ -79,7 +90,6 @@ get_names_list <- function(type = "par", stics_version = "latest") {
   }
   # temporarily early return, without using of environment.
   return(names)
-
 
   # ----------------- section using stics environment function commented ------------------#
   # # Create a variable: param_names or var_names in the stics_names environment
@@ -95,72 +105,105 @@ get_names_list <- function(type = "par", stics_version = "latest") {
   # ----------------- commented: ending section using stics environment function ------------------#
 
   # the first column: name for par, variable for var
-  if ( !base::is.null(names) & length(names) ) return(names)
+  if (!base::is.null(names) & length(names)) return(names)
 
   return()
 }
 
 
 get_usefull_cols <- function(df, ids) {
-
   if (!all(dim(df))) return(df)
 
   real_ids <- intersect(1:ncol(df), ids)
 
   if (!length(real_ids)) return(data.frame())
 
-  return(subset(df,select = real_ids))
+  return(subset(df, select = real_ids))
 }
 
-format_name <- function(name, type = "par", kind = NULL, inline = FALSE, latex = FALSE ) {
-
+format_name <- function(
+  name,
+  type = "par",
+  kind = NULL,
+  inline = FALSE,
+  latex = FALSE
+) {
   types <- c("var", "par", "int")
   in_sign <- "$"
   escape <- ""
   if (latex) escape <- "\\"
 
-  if ( !inline ) in_sign <- ""
+  if (!inline) in_sign <- ""
 
-  if ( ! type %in% types ) return()
+  if (!type %in% types) return()
 
-  if ( type == "var" && base::is.null(kind) ) {
+  if (type == "var" && base::is.null(kind)) {
     return(paste0(in_sign, make_pattern(name), in_sign))
   }
 
-  if ( type == "int" && base::is.null(kind) ) {
-    return(paste0(in_sign, escape, "\\mathsf{",make_pattern(name),"}", in_sign))
+  if (type == "int" && base::is.null(kind)) {
+    return(paste0(
+      in_sign,
+      escape,
+      "\\mathsf{",
+      make_pattern(name),
+      "}",
+      in_sign
+    ))
   }
 
   # Identity
-  if ( base::is.null(kind) ) return()
+  if (base::is.null(kind)) return()
 
   ind <- dico_kind_to_index(kind = kind)
 
   #name <- gsub(pattern = "\\_", replacement = "\\\\_", name)
   name <- make_pattern(name)
 
-  name_str <- paste0(in_sign, escape,"\\mathbf{", name,"}","_{",ind,"}", in_sign)
+  name_str <- paste0(
+    in_sign,
+    escape,
+    "\\mathbf{",
+    name,
+    "}",
+    "_{",
+    ind,
+    "}",
+    in_sign
+  )
 
   return(name_str)
-
 }
 
-format_names <- function(names, kinds = NULL, type = "par", inline = FALSE, latex = FALSE) {
-
+format_names <- function(
+  names,
+  kinds = NULL,
+  type = "par",
+  inline = FALSE,
+  latex = FALSE
+) {
   # checking dimensions
   names_nb <- length(names)
 
-  if ( base::is.null(kinds) ) {
-    return(unlist(lapply(names, function(x) format_name(x, type = type, inline = inline, latex = latex))))
+  if (base::is.null(kinds)) {
+    return(unlist(lapply(
+      names,
+      function(x) format_name(x, type = type, inline = inline, latex = latex)
+    )))
   }
 
-  if( names_nb != length(kinds) ) {
+  if (names_nb != length(kinds)) {
     stop("Error: parameter kind number must match parameter number !")
   }
 
   out_names <- vector(mode = "character", names_nb)
-  for ( i in 1:names_nb ) {
-    out_names[i] <- format_name(name = names[i], kind = kinds[i], inline = inline, latex = latex)
+  for (i in 1:names_nb) {
+    out_names[i] <- format_name(
+      name = names[i],
+      kind = kinds[i],
+      inline = inline,
+      latex = latex
+    )
   }
 
   return(out_names)
@@ -168,52 +211,77 @@ format_names <- function(names, kinds = NULL, type = "par", inline = FALSE, late
 
 
 #format_names_link <- function(names, kinds = NULL , type = "par", target = FALSE, inline = FALSE, latex = FALSE) {
-format_names_link <- function(names, kinds = NULL, type = "par", target = FALSE, inline = FALSE, latex = FALSE) {
-
+format_names_link <- function(
+  names,
+  kinds = NULL,
+  type = "par",
+  target = FALSE,
+  inline = FALSE,
+  latex = FALSE
+) {
   escape <- ""
   if (latex) escape <- "\\"
 
   if (type == "par") kinds <- SticsPubRTools:::get_names_kind(names = names)
 
-  formatted_names <- format_names(names = names, kinds = kinds, type = type, inline = inline, latex = latex)
+  formatted_names <- format_names(
+    names = names,
+    kinds = kinds,
+    type = type,
+    inline = inline,
+    latex = latex
+  )
 
   names_label <- get_label_from_name(names)
 
-  if ( target ) {
+  if (target) {
     fmt <- "[%s]{#%s-%s}"
-    names_link <- sprintf(fmt = fmt, formatted_names, type, names_label )
+    names_link <- sprintf(fmt = fmt, formatted_names, type, names_label)
   } else {
-    fmt <- paste0("[%s](#%s-%s)", escape,"\\index{%s}")
-    names_link <- sprintf(fmt = fmt, formatted_names, type, names_label, names )
+    fmt <- paste0("[%s](#%s-%s)", escape, "\\index{%s}")
+    names_link <- sprintf(fmt = fmt, formatted_names, type, names_label, names)
   }
 
   return(names_link)
 }
 
-format_names_target <- function(names, kinds = NULL, type = "par", inline = FALSE, latex = FALSE) {
-  return(format_names_link(names = names, kinds = NULL, type = type, target = TRUE, inline = inline, latex = latex))
+format_names_target <- function(
+  names,
+  kinds = NULL,
+  type = "par",
+  inline = FALSE,
+  latex = FALSE
+) {
+  return(format_names_link(
+    names = names,
+    kinds = NULL,
+    type = type,
+    target = TRUE,
+    inline = inline,
+    latex = latex
+  ))
 }
 
 
 get_names_kind <- function(names, stics_version = "latest") {
-  stics_version <- SticsRFiles:::check_version_compat(stics_version = stics_version)
+  stics_version <- SticsRFiles:::check_version_compat(
+    stics_version = stics_version
+  )
   names_data <- get_names_list(type = "par", stics_version = stics_version)
 
   kinds <- rep(NA, length(names))
   idx_names <- names %in% names_data$name
-  kinds[idx_names] <-  names_data$kind[names_data$name %in% names[idx_names]]
+  kinds[idx_names] <- names_data$kind[names_data$name %in% names[idx_names]]
 
-  if ( !all(idx_names) ) {
-    warning(paste(names[!idx_names],collapse = ","),": unknown name(s) !")
+  if (!all(idx_names)) {
+    warning(paste(names[!idx_names], collapse = ","), ": unknown name(s) !")
   }
 
   kinds
-
 }
 
 
-dico_kind_to_index <- function( kind = NULL) {
-
+dico_kind_to_index <- function(kind = NULL) {
   kinds <- list()
 
   kinds$STATION <- "C"
@@ -230,41 +298,39 @@ dico_kind_to_index <- function( kind = NULL) {
   kinds$INIT <- "I"
   kinds$java <- "j"
 
-  if ( base::is.null(kind) ) return(kinds)
-
+  if (base::is.null(kind)) return(kinds)
 
   kind <- make.names(kind)
   idx <- kind %in% names(kinds)
 
-
   indexes <- unlist(lapply(kind[idx], function(x) kinds[[x]]))
   return(indexes)
-
 }
 
 make_pattern <- function(name, symbol = c("_", "."), where = NULL) {
-
   pos <- c("start", "end")
-  if ( (!base::is.null(where)) && (! where %in% pos) ) where <- NULL
+  if ((!base::is.null(where)) && (!where %in% pos)) where <- NULL
 
-  for ( i in 1:length(symbol) ) {
+  for (i in 1:length(symbol)) {
     s <- symbol[i]
-    name <- gsub(pattern = paste0("\\",s), x = name, replacement = paste0('\\\\',s))
+    name <- gsub(
+      pattern = paste0("\\", s),
+      x = name,
+      replacement = paste0('\\\\', s)
+    )
   }
 
-  if ( base::is.null(where) ) return(name)
+  if (base::is.null(where)) return(name)
 
-  if ( where == "start" ) return(paste0("^", name))
+  if (where == "start") return(paste0("^", name))
 
-  if ( where == "end" ) return(paste0(name, "$"))
+  if (where == "end") return(paste0(name, "$"))
 
   #return(name)
 }
 
 
-
-all_int_var <- function(stics_version = "latest", lib = FALSE){
-
+all_int_var <- function(stics_version = "latest", lib = FALSE) {
   # lib = FALSE, searching locally in the book project dir
   # lib = TRUE, searching in the lib path in SticsRFiles installed package
 
@@ -277,17 +343,25 @@ all_int_var <- function(stics_version = "latest", lib = FALSE){
   #file_path <- file.path(rstudioapi::getActiveProject(),"data","internal_variables_v10.csv")
   if (!lib) {
     # working in Stics book directory
-    file_path <- file.path(getwd(),"data","internal_variables_v10.csv")
+    file_path <- file.path(getwd(), "data", "internal_variables_v10.csv")
   } else {
-    dir <- file.path(Sys.getenv()["R_LIBS_USER"],"SticsRFiles","extdata","csv", version)
-    file_path <- file.path(dir,"internal_variables_v10.csv")
+    dir <- file.path(
+      Sys.getenv()["R_LIBS_USER"],
+      "SticsRFiles",
+      "extdata",
+      "csv",
+      version
+    )
+    file_path <- file.path(dir, "internal_variables_v10.csv")
   }
 
   if (!file.exists(file_path)) return(invisible(data.frame()))
 
-  var_df <- utils::read.csv2(file_path,
-                             header = TRUE,
-                             stringsAsFactors = FALSE)[,1:4]
+  var_df <- utils::read.csv2(
+    file_path,
+    header = TRUE,
+    stringsAsFactors = FALSE
+  )[, 1:4]
 
   names(var_df) <- c("name", "definition", "unit", "internal")
 
@@ -295,4 +369,3 @@ all_int_var <- function(stics_version = "latest", lib = FALSE){
   attr(x = var_df, which = "version") <- version
   return(var_df)
 }
-
