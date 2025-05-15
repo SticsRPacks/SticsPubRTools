@@ -268,7 +268,7 @@ get_names_kind <- function(names, stics_version = "latest") {
 
   kinds <- rep(NA, length(names))
   idx_names <- names %in% names_data$name
-  kinds[idx_names] <- names_data$kind[names_data$name %in% names[idx_names]]
+  kinds[idx_names] <- names_data$file[names_data$name %in% names[idx_names]]
 
   if (!all(idx_names)) {
     warning(paste(names[!idx_names], collapse = ","), ": unknown name(s) !")
